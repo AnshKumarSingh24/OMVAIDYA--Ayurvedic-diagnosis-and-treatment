@@ -46,6 +46,14 @@ export default function Navbar({
 
         {/* Right Actions: Patient Selector & Theme */}
         <div className="flex items-center space-x-3">
+          {/* Link back to landing */}
+          <button
+            onClick={() => window.location.href = '/landing'}
+            className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-300 transition"
+          >
+            Landing
+          </button>
+
           {/* Patient Selector */}
           <div className="flex items-center space-x-2">
             <select
@@ -63,10 +71,11 @@ export default function Navbar({
 
             <button
               onClick={onNewPatient}
-              title="Add New Patient Case"
-              className="p-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white shadow-sm transition"
+              title="Add New Patient Case / Onboarding"
+              className="px-2.5 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white shadow-sm transition text-xs font-bold flex items-center space-x-1"
             >
-              <PlusCircle className="w-4 h-4" />
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Intake</span>
             </button>
           </div>
 

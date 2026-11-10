@@ -235,12 +235,68 @@ CANONICAL_SHLOKAS: List[Dict[str, Any]] = [
         "contraindications": ["Sugar", "Sweets", "Refined flour", "Day sleep", "Sedentary habits"],
         "anupana_rules": ["Warm water", "Amalaki juice with Madhu (in moderation)"],
         "keywords": ["prameha", "diabetes", "madhumeha", "chandraprabha vati", "nishamalaki", "kapha", "curd"]
+    },
+    {
+        "shloka_id": "CS_CHI_17_070",
+        "treatise": "Charaka Samhita",
+        "sthana": "Chikitsa Sthana",
+        "adhyaya": "Hikka Shwasa Chikitsa (Chapter 17)",
+        "shloka_number": "70",
+        "sanskrit_devanagari": "प्रतिलोमं यदा वायुः स्रोतांसि प्रतिपद्यते। कफमुद्गोचयन् कृच्छ्रात् श्वासं जनयति दारुणम्॥",
+        "sanskrit_iast": "pratilomaṁ yadā vāyuḥ srotāṁsi pratipadyate | kaphamudgocayan kṛcchrāt śvāsaṁ janayati dāruṇam ||",
+        "english_translation": "When Vata moves in an upward, retrograde direction (Pratiloma), it obstructs the Pranavaha channels and mobilizes Kapha, producing severe respiratory distress and breathless wheezing (Tamaka Shwasa / Bronchial Asthma).",
+        "hindi_translation": "जब वायु प्रतिलोम गति में होकर प्राणवह स्रोतों को अवरुद्ध करती है और कफ को उभारती है, तब कष्टसाध्य दारुण तमक श्वास (अस्थमा) उत्पन्न होता है।",
+        "dosha_association": ["Vata", "Kapha"],
+        "indications": ["Tamaka Shwasa", "Bronchial Asthma", "Dyspnea", "Wheezing", "Cough"],
+        "formulations": ["Sitopaladi Churna", "Kanakasava", "Shvasakasa Chintamani"],
+        "contraindications": ["Cold water bath", "Dust exposure", "Heavy kapha diet"],
+        "anupana_rules": ["Warm water", "Honey with ginger juice"],
+        "keywords": ["shwasa", "asthma", "tamaka shwasa", "sitopaladi", "wheezing", "pratiloma vata"]
+    },
+    {
+        "shloka_id": "CS_CHI_07_024",
+        "treatise": "Charaka Samhita",
+        "sthana": "Chikitsa Sthana",
+        "adhyaya": "Kushtha Chikitsa (Chapter 7)",
+        "shloka_number": "24",
+        "sanskrit_devanagari": "वातोत्तरेषु सर्पिर्वमनं श्लेष्मोत्तरेषु कुष्ठेषु। पित्तोत्तरेषु मोक्षो रक्तस्य विरेचनं श्रेष्ठम्॥",
+        "sanskrit_iast": "vātottareṣu sarpirvamanaṁ śleṣmottareṣu kuṣṭheṣu | pittottareṣu mokṣo raktasya virecanaṁ śreṣṭham ||",
+        "english_translation": "In Kushtha (Skin disorders), if Vata is predominant, Medicated Ghee (Tikta Ghrita) is supreme; if Kapha is predominant, emesis (Vamana) is indicated; if Pitta is predominant, bloodletting (Raktamokshana) and purgation (Virechana) are the treatments of choice.",
+        "hindi_translation": "कुष्ठ में वात प्रधान होने पर घृत, कफ प्रधान होने पर वमन, और पित्त प्रधान होने पर रक्तमोक्षण तथा विरेचन सर्वश्रेष्ठ चिकित्सा है।",
+        "dosha_association": ["Tridosha", "Pitta", "Kapha"],
+        "indications": ["Kushtha", "Skin disorders", "Psoriasis", "Eczema", "Dermatitis"],
+        "formulations": ["Arogyavardhini Vati", "Khadirarishta", "Mahatiktaka Ghrita"],
+        "contraindications": ["Curd with fish", "Incompatible diet", "Excess salt"],
+        "anupana_rules": ["Khadira Kwatha", "Warm water"],
+        "keywords": ["kushtha", "skin", "eczema", "psoriasis", "arogyavardhini", "khadirarishta"]
     }
 ]
 
 
 # Verified Botanical & Formulation Safety Dictionary
 FORMULATION_SAFETY_CATALOG: Dict[str, Dict[str, Any]] = {
+    "Sitopaladi Churna": {
+        "ingredients": ["Mishri", "Vamshalochana", "Pippali", "Ela", "Tvak"],
+        "indications": ["Kasa", "Shwasa", "Tamaka Shwasa", "Mandagni", "Bronchitis"],
+        "standard_dosage": "2-3 grams twice daily with honey or ghee",
+        "approved_anupana": ["Madhu (Honey)", "Ghee", "Warm water"],
+        "disallowed_anupana": ["Cold water", "Sour curd"],
+        "contraindications": ["Uncontrolled diabetes (due to Mishri content)"],
+        "pediatric_safe": True,
+        "pregnancy_safe": True,
+        "shloka_ref": "CS_CHI_17_070"
+    },
+    "Arogyavardhini Vati": {
+        "ingredients": ["Shuddha Parada", "Shuddha Gandhaka", "Lauha Bhasma", "Abhraka Bhasma", "Tamra Bhasma", "Triphala", "Shilajit", "Guggulu", "Chitraka", "Katuki"],
+        "indications": ["Kushtha", "Yakrit Roga", "Kamala", "Jaundice", "Obesity", "Skin disorders"],
+        "standard_dosage": "1-2 tablets (250mg - 500mg) twice daily after food",
+        "approved_anupana": ["Warm water", "Neem Kwatha"],
+        "disallowed_anupana": ["Cold water", "Milk"],
+        "contraindications": ["Pregnancy (Strictly contraindicated due to Tamra/Parada)", "Severe renal failure"],
+        "pediatric_safe": False,
+        "pregnancy_safe": False,
+        "shloka_ref": "CS_CHI_07_024"
+    },
     "Simhanada Guggulu": {
         "ingredients": ["Shuddha Guggulu", "Triphala", "Shuddha Gandhaka", "Eranda Taila"],
         "indications": ["Amavata", "Rheumatoid Arthritis", "Vatarakta", "Skin diseases"],

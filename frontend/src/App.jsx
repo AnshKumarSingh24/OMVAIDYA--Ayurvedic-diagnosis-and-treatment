@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Landing from './pages/Landing';
@@ -24,6 +24,12 @@ function AppLayout() {
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  const isOnboarded = localStorage.getItem('ayuvaidya_onboarded') === 'true';
+
+  // Full bleed views without dashboard sidebar
+  const isLandingView = location.pathname === '/landing' || (location.pathname === '/' && !isOnboarded);
+  const isOnboardingView = location.pathname === '/onboarding' || location.pathname === '/intake';
 
   // Load patients on mount
   useEffect(() => {
@@ -57,7 +63,44 @@ function AppLayout() {
     setActivePatientId(newId);
   };
 
-  const isLandingView = location.pathname === '/landing';
+  const handleSelectPreset = (type) => {
+    localStorage.setItem('ayuvaidya_onboarded', 'true');
+    // Map preset to demo patient
+    if (patients.length > 0) {
+      if (type === 'amavata') {
+        const p = patients.find(p => p.full_name.includes('Sundaram')) || patients[0];
+        setActivePatientId(p.id);
+      } else if (type === 'grahani') {
+        const p = patients.find(p => p.full_name.includes('Sharma')) || patients[0];
+        setActivePatientId(p.id);
+      } else if (type === 'prameha') {
+        const p = patients.find(p => p.full_name.includes('Deshmukh')) || patients[0];
+        setActivePatientId(p.id);
+      }
+    }
+    navigate('/app');
+  };
+
+  // Full-bleed views render without the dashboard sidebar
+  if (isLandingView) {
+    return (
+      <div className={`min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 transition-colors ${isDark ? 'dark' : ''}`}>
+        <main className="max-w-7xl mx-auto px-4 sm:px-6">
+          <Landing onSelectPreset={handleSelectPreset} />
+        </main>
+      </div>
+    );
+  }
+
+  if (isOnboardingView) {
+    return (
+      <div className={`min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 transition-colors ${isDark ? 'dark' : ''}`}>
+        <main className="max-w-4xl mx-auto px-4 py-8">
+          <Onboarding onPatientCreated={handlePatientCreated} />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100 transition-colors ${isDark ? 'dark' : ''}`}>
@@ -66,26 +109,23 @@ function AppLayout() {
         patients={patients}
         activePatientId={activePatientId}
         onSelectPatient={(id) => setActivePatientId(id)}
-        onNewPatient={() => navigate('/intake')}
+        onNewPatient={() => navigate('/onboarding')}
         isDark={isDark}
         onToggleTheme={handleToggleTheme}
       />
 
       <div className="flex">
-        {/* Left Sidebar (hidden on Landing page) */}
-        {!isLandingView && (
-          <Sidebar
-            isOpen={isSidebarOpen}
-            onClose={() => setIsSidebarOpen(false)}
-          />
-        )}
+        {/* Left Sidebar */}
+        <Sidebar
+          isOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
 
-        {/* Main Content Area */}
-        <main className={`flex-1 px-4 sm:px-6 lg:px-8 py-6 w-full ${!isLandingView ? 'md:pl-72' : 'max-w-7xl mx-auto'}`}>
+        {/* Main Dashboard Content Area */}
+        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 w-full md:pl-72">
           <Routes>
             <Route path="/" element={<Home activePatientId={activePatientId} patients={patients} />} />
-            <Route path="/landing" element={<Landing onSelectPreset={(p) => console.log(p)} />} />
-            <Route path="/intake" element={<Onboarding onPatientCreated={handlePatientCreated} />} />
+            <Route path="/app" element={<Home activePatientId={activePatientId} patients={patients} />} />
             <Route path="/samprapti" element={<Samprapti activePatientId={activePatientId} patients={patients} />} />
             <Route path="/chikitsa" element={<Chikitsa activePatientId={activePatientId} patients={patients} />} />
             <Route path="/rag" element={<RagExplorer />} />
@@ -101,6 +141,7 @@ function AppLayout() {
               </div>
             } />
             <Route path="/profile" element={<Profile />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>
@@ -115,4 +156,3 @@ export default function App() {
     </Router>
   );
 }
-
