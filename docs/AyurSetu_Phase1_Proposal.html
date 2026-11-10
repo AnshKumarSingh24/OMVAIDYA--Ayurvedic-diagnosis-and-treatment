@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AyurSetu: Phase 1 Technical & Clinical Proposal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Martel:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #1c1917;
+      line-height: 1.65;
+    }
+    .font-sanskrit {
+      font-family: 'Martel', serif;
+    }
+    h1, h2, h3, h4 {
+      font-weight: 700;
+      color: #0c0a09;
+    }
+    h1 { font-size: 1.85rem; border-bottom: 2px solid #059669; padding-bottom: 0.5rem; margin-top: 1.5rem; }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid #e7e5e4; padding-bottom: 0.35rem; margin-top: 2rem; margin-bottom: 0.75rem; color: #065f46; }
+    h3 { font-size: 1.15rem; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #1f2937; }
+    table { width: 100%; border-collapse: collapse; margin: 1.25rem 0; font-size: 0.875rem; }
+    th, td { border: 1px solid #d6d3d1; padding: 8px 12px; text-align: left; }
+    th { background-color: #f5f5f4; font-weight: 600; color: #292524; }
+    tr:nth-child(even) { background-color: #fafaf9; }
+    code { background-color: #f5f5f4; padding: 2px 5px; border-radius: 4px; font-size: 0.85em; font-family: monospace; }
+    pre code { display: block; padding: 12px; overflow-x: auto; background-color: #1c1917; color: #f5f5f4; border-radius: 8px; }
+    blockquote { border-left: 4px solid #059669; padding-left: 1rem; color: #57534e; margin: 1rem 0; font-style: italic; }
+    @media print {
+      body { font-size: 11pt; }
+      .no-print { display: none !important; }
+      a { text-decoration: none; color: inherit; }
+      pre code { white-space: pre-wrap; }
+    }
+  </style>
+</head>
+<body class="bg-stone-50 py-10">
+
+  <!-- Print Button Bar (Hidden in Print) -->
+  <div class="no-print max-w-4xl mx-auto mb-6 px-6 flex justify-between items-center">
+    <div class="text-xs text-stone-500">
+      <strong>Techfest 2026–27</strong> &bull; Ministry of Ayush &bull; AIIA Challenge Submission
+    </div>
+    <button onclick="window.print()" class="bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs px-4 py-2 rounded-lg shadow transition flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+      Print / Save as PDF
+    </button>
+  </div>
+
+  <!-- Document Container -->
+  <article class="max-w-4xl mx-auto bg-white border border-stone-200 rounded-2xl shadow-sm p-8 sm:p-14">
+    <h1>AyurSetu: Source-Grounded Clinical Decision Support &amp; Classical Knowledge Retrieval System</h1>
+<p><strong>AyushTech Innovate: National Open Ayurveda AI Challenge 2026–27</strong><br />
+<em>Organized by Techfest, IIT Bombay in collaboration with the Ministry of Ayush &amp; All India Institute of Ayurveda (AIIA)</em></p>
+<hr />
+<h2>Technical &amp; Clinical Grounding Proposal (Phase 1 Submission)</h2>
+<p><strong>Project Title:</strong> AyurSetu (आयुर्सेतु) — The Bridge Between Classical Brihat Trayi Wisdom and Safe Clinical AI<br />
+<strong>Track:</strong> Clinical &amp; Practitioner Intelligence / Academic &amp; Research Knowledge Systems<br />
+<strong>Core LLM Engine:</strong> AyurParam (IIT Bombay's Open-Source 2.9B Ayurveda Model)<br />
+<strong>Open-Source License:</strong> MIT License<br />
+<strong>Repository Structure:</strong> Modular Python (FastAPI + Pydantic v2) + Hybrid RAG (BM25 + Dense) + AyurGuard Deterministic Safety Firewall</p>
+<hr />
+<h2>1. Executive Summary &amp; Clinical Problem Formulation</h2>
+<h3>1.1 The Clinical &amp; Academic Bottleneck</h3>
+<p>Ayurveda is an evidence-backed system of holistic medicine governed by multi-factorial diagnostic logic (<em>Trisutra</em>: <em>Hetu</em>, <em>Linga</em>, <em>Aushadha</em>) and personalized constitutional analysis (<em>Prakriti</em>, <em>Agni</em>, <em>Koshtha</em>, <em>Dhatu</em>, <em>Srotas</em>). However, in modern clinical and academic environments, Vaidyas (practitioners) and BAMS/MD students face three critical challenges:</p>
+<ol>
+<li>
+<p><strong>Information Overload &amp; Granular Shloka Retrieval Friction</strong>:<br />
+The <em>Brihat Trayi</em> (Charaka Samhita, Sushruta Samhita, and Ashtanga Hridaya) comprises over 20,000 verses. Correlating a patient's complex symptom clusters (<em>Lakshana-samucchaya</em>) with the classical etiopathogenesis (<em>Samprapti</em>) and locating the authentic source verse (<em>Sthana</em>, <em>Adhyaya</em>, and <em>Shloka</em>) currently requires extensive manual cross-referencing. During high-volume outpatient department (OPD) hours, this often leads to empirical shortcuts rather than treatise-grounded care.</p>
+</li>
+<li>
+<p><strong>Severe Hallucination &amp; Lethal Risks of Generalist AI</strong>:<br />
+When general-purpose Large Language Models (LLMs) are queried for Ayurvedic guidance, they routinely:</p>
+<ul>
+<li>Hallucinate classical citations (fabricating verse numbers in Charaka or Sushruta).</li>
+<li>Omit essential adjuvants (<em>Anupana</em>), without which herbal formulations can be ineffective or harmful.</li>
+<li>Recommend drastic purification procedures (<em>Shodhana</em> such as <em>Virechana</em> or <em>Vamana</em>) or toxic mineral preparations (<em>Rasa Shastra</em>) to vulnerable demographics (pregnant women, infants, or the frail elderly).</li>
+</ul>
+</li>
+<li>
+<p><strong>Absence of Deterministic Contraindication Guardrails</strong>:<br />
+Ayurvedic pharmacology (<em>Dravyaguna</em>) operates under strict rules of <em>Viruddha Ahara</em> (incompatible food combinations) and seasonal adjustments (<em>Ritucharya</em>). Probabilistic neural networks cannot be trusted to enforce these rules without a deterministic, rule-based verification layer.</p>
+</li>
+</ol>
+<h3>1.2 The AyurSetu Solution</h3>
+<p><strong>AyurSetu</strong> is an open-source, source-traceable Clinical Decision Support System (CDSS) and Classical Retrieval Engine engineered around <strong>AyurParam (2.9B)</strong>. AyurSetu guarantees <strong>source verifiability</strong> and <strong>clinical safety</strong> through three pillars:</p>
+<ul>
+<li><strong>Shloka-Level Canonical RAG</strong>: Every clinical insight, disease correlation, and formulation recommendation is anchored to authentic <em>Brihat Trayi</em> verses with immutable identifiers (<code>[Treatise, Sthana, Adhyaya, Shloka]</code>).</li>
+<li><strong>Automated Samprapti Modeling Engine</strong>: Structures patient diagnostic workflows from <em>Hetu</em> (etiology) to <em>Dosha-Dushya Sammurchhana</em> (pathology progression) to <em>Chikitsa Sutra</em> (treatment principles).</li>
+<li><strong>AyurGuard Deterministic Safety Firewall</strong>: An independent, rule-based clinical validation layer that audits every prescription for <em>Anupana</em> compatibility, pregnancy (<em>Garbhini</em>), pediatric (<em>Bala</em>), and seasonal (<em>Ritucharya</em>) restrictions before rendering.</li>
+</ul>
+<hr />
+<h2>2. System Architecture &amp; Engineering Stack</h2>
+<pre><code class="language-mermaid">flowchart TD
+    subgraph ClientLayer [Client &amp; Interface Tier]
+        UI[Interactive Vaidya Consult Dashboard\nMultilingual English/Hindi/Sanskrit]
+    end
+
+    subgraph APILayer [Orchestration &amp; Gateway Tier]
+        Gateway[FastAPI REST Gateway\nValidation via Pydantic v2]
+    end
+
+    subgraph ReasoningCore [AyurParam 2.9B Intelligence Stack]
+        CoT[Chain-of-Thought Ayurvedic Reasoner\nStructured JSON Output Protocol]
+        AyurParam[AyurParam 2.9B Model Core\nIIT Bombay Open-Source Architecture]
+    end
+
+    subgraph GroundingTier [Canonical Brihat Trayi RAG Engine]
+        RAGEngine[Hybrid Retrieval Engine]
+        BM25[Sparse BM25 Index\nMultilingual &amp; IAST Sanskrit]
+        DenseVec[Dense Vector Embeddings\nCosine Similarity Search]
+        CorpusDB[(Authenticated Classical Corpus\nCharaka, Sushruta, Ashtanga Hridaya)]
+    end
+
+    subgraph SafetyTier [AyurGuard Safety Firewall - Deterministic Layer]
+        AyurGuard[AyurGuard Clinical Rule Engine]
+        RuleAnupana{Anupana Verification}
+        RuleGarbhini{Pregnancy / Bala Restriction}
+        RuleViruddha{Viruddha Ahara Audit}
+        RuleCitation{Citation Integrity Check}
+    end
+
+    UI --&gt;|Patient Case: Symptoms, Prakriti, Agni, Age| Gateway
+    Gateway --&gt; RAGEngine
+    RAGEngine &lt;--&gt; CorpusDB
+    RAGEngine --&gt;|Ranked Classical Shlokas &amp; Metadata| CoT
+    CoT &lt;--&gt; AyurParam
+    AyurParam --&gt;|Candidate Samprapti &amp; Formulations| AyurGuard
+    AyurGuard --&gt; RuleAnupana &amp; RuleGarbhini &amp; RuleViruddha &amp; RuleCitation
+    AyurGuard --&gt;|Approved Grounded Diagnosis + Shloka Cards| Gateway
+    Gateway --&gt; UI
+</code></pre>
+<h3>2.1 Architectural Components</h3>
+<ol>
+<li><strong>Multilingual Diagnostic Intake</strong>:<br />
+Accepts clinical chief complaints, constitutional parameters (<em>Prakriti</em>, <em>Agni</em>, <em>Koshtha</em>), demographic details (age, pregnancy, lactation), and current season (<em>Ritu</em>).</li>
+<li><strong>Hybrid Canonical RAG Engine</strong>:
+<ul>
+<li>Indexes canonical verses in both Devanagari Sanskrit and IAST (International Alphabet of Sanskrit Transliteration) Roman script.</li>
+<li>Employs hybrid sparse-dense retrieval ($BM25 + \text{Cosine Similarity}$) with domain-weighted boosting for clinical keywords, indications, and classical formulations.</li>
+</ul>
+</li>
+<li><strong>AyurParam 2.9B Reasoning Core</strong>:
+<ul>
+<li>Receives the retrieved classical contexts and patient parameters within a constrained clinical prompt template.</li>
+<li>Generates structured <em>Samprapti Ghatakas</em> (Dosha, Dushya, Agni, Ama, Srotas, Sroto-dushti, Adhisthana) and <em>Chikitsa Sutra</em>.</li>
+</ul>
+</li>
+<li><strong>AyurGuard Deterministic Firewall</strong>:
+<ul>
+<li>Acts as a zero-trust intermediary outside the LLM.</li>
+<li>Evaluates prescriptions against the certified <em>Formulation Safety Catalog</em> and <em>Viruddha Ahara Matrix</em>.</li>
+<li>Rejects or flags unverified vehicles, dangerous drug combinations, and unauthorized shloka citations.</li>
+</ul>
+</li>
+</ol>
+<hr />
+<h2>3. AyurParam 2.9B Model Integration &amp; In-Context Grounding</h2>
+<h3>3.1 Model Utilization &amp; Optimization</h3>
+<p>AyurParam (IIT Bombay’s open-source 2.9B parameter language model) is trained specifically on Indian medical and Ayurvedic corpora. AyurSetu integrates AyurParam via two complementary deployment paths:</p>
+<ul>
+<li><strong>Local Edge / On-Premise Deployment</strong>: Runnable via <code>vLLM</code> or <code>Ollama</code> quantized to 4-bit/8-bit (GGUF/AWQ), requiring under 4GB VRAM. This enables rural clinics and standalone Ayurvedic hospitals without continuous high-speed internet to operate fully offline.</li>
+<li><strong>Structured JSON Schema Enforcement</strong>: Utilizing constrained decoding (via Pydantic schemas) to guarantee that model outputs strictly adhere to the <code>ClinicalDiagnosticResponse</code> format without extraneous preamble or conversational drift.</li>
+</ul>
+<h3>3.2 Clinical Chain-of-Thought (CoT) Prompt Template</h3>
+<p>The reasoning prompt constrains AyurParam to authentic classical terminology:</p>
+<pre><code class="language-text">[SYSTEM: CLINICAL AYURVEDIC REASONER - AYURPARAM 2.9B]
+You are AyurParam, an expert Vaidya clinical assistant.
+You are provided with verified excerpts from the Brihat Trayi:
+{RETRIEVED_CLASSICAL_SHLOKAS}
+
+PATIENT PROFILE:
+- Age: {age}, Gender: {gender}, Pregnancy: {is_pregnant}
+- Prakriti: {prakriti}, Agni: {agni}, Koshtha: {koshtha}
+- Chief Complaints: {chief_complaints}
+- Current Ritu (Season): {current_season}
+
+TASK:
+1. Formulate Roganirnaya (probable Vyadhi).
+2. Deconstruct the Samprapti Ghatakas (Dosha, Dushya, Agni, Ama, Srotas, Sroto-dushti, Adhisthana).
+3. State the governing classical Chikitsa Sutra citing the exact verse.
+4. Recommend classical formulations with mandatory Anupana, dosage, and Kala.
+5. Provide Pathya (wholesome) and Apathya (unwholesome) regimens.
+CRITICAL RULE: Do not prescribe any formulation without citing its authentic shloka_id from the retrieved context.
+</code></pre>
+<hr />
+<h2>4. Source-Grounding &amp; Shloka-Level Traceability Pipeline</h2>
+<h3>4.1 Classical Corpus Ingestion Schema</h3>
+<p>The knowledge repository is structured around authenticated editions of the <em>Brihat Trayi</em>:</p>
+<ul>
+<li><strong>Charaka Samhita</strong> (Agnivesha / Dridhabala redaction)</li>
+<li><strong>Sushruta Samhita</strong> (Vriddha Sushruta / Nagarjuna redaction)</li>
+<li><strong>Ashtanga Hridaya</strong> (Vagbhata)</li>
+</ul>
+<p>Each verse is indexed with atomic metadata:</p>
+<pre><code class="language-json">{
+  &quot;shloka_id&quot;: &quot;CS_CHI_15_051&quot;,
+  &quot;treatise&quot;: &quot;Charaka Samhita&quot;,
+  &quot;sthana&quot;: &quot;Chikitsa Sthana&quot;,
+  &quot;adhyaya&quot;: &quot;Grahani Dosha Chikitsa (Chapter 15)&quot;,
+  &quot;shloka_number&quot;: &quot;51&quot;,
+  &quot;sanskrit_devanagari&quot;: &quot;शान्तेऽग्नौ म्रियते, युक्ते चिरं जीवत्यनामयः। रोगी स्याद्विकृते, मूलमग्निस्तस्मान्निरुच्यते॥&quot;,
+  &quot;sanskrit_iast&quot;: &quot;śānte'gnau mriyate, yukte ciraṁ jīvatyanāmayaḥ | rogī syādvikṛte, mūlamagnistasmānnirucyate ||&quot;,
+  &quot;english_translation&quot;: &quot;When Agni is extinguished, the person dies; when it is balanced, one lives a long and disease-free life; when it is deranged, one suffers from diseases. Therefore, Agni is the root cause of health and longevity.&quot;,
+  &quot;dosha_association&quot;: [&quot;Vata&quot;, &quot;Pitta&quot;, &quot;Kapha&quot;],
+  &quot;indications&quot;: [&quot;Grahani&quot;, &quot;Mandagni&quot;, &quot;Agnimandya&quot;, &quot;IBS&quot;, &quot;Indigestion&quot;],
+  &quot;formulations&quot;: [&quot;Takrarishta&quot;, &quot;Chitrakadi Vati&quot;, &quot;Panchamrit Parpati&quot;],
+  &quot;anupana_rules&quot;: [&quot;Takra (Buttermilk)&quot;, &quot;Warm water&quot;]
+}
+</code></pre>
+<h3>4.2 Hallucination Elimination via Verification Protocol</h3>
+<p>AyurSetu implements a <strong>Citation Verification Protocol</strong>:</p>
+<ol>
+<li>When AyurParam outputs a formulation or principle with citation <code>[ID]</code>, the RAG verifier queries the canonical database.</li>
+<li>If the verse ID does not match an authenticated entry in the Brihat Trayi registry, the response is intercepted.</li>
+<li>If the verse does not contain the referenced herbal entity or clinical indication, a <code>MISATTRIBUTION ALERT</code> is triggered.</li>
+<li>The system replaces ungrounded text with the closest verified canonical excerpt or escalates to physician review.</li>
+</ol>
+<hr />
+<h2>5. AyurGuard Deterministic Medical Safety &amp; Contraindication Guardrails</h2>
+<p>To meet the rigorous safety criteria defined by Techfest and the Ministry of Ayush, AyurGuard enforces multi-tier deterministic validation:</p>
+<p>| Safety Layer | Potential Risk / Clinical Failure Mode | AyurGuard Verification Mechanism | Action on Failure |<br />
+| :--- | :--- | :--- | :--- |<br />
+| <strong>Anupana Compatibility</strong> | Taking Simhanada Guggulu with cold water causes <em>Guggulu Sanga</em> and digestive distress; combining honey with hot water (<em>Samskara Viruddha</em>). | Cross-references prescribed vehicle against approved/disallowed list in the formulation registry. | <strong>Hard Block</strong>: Replaces invalid vehicle with canonical <em>Ushnodaka</em> (warm water) or <em>Takra</em> (buttermilk) with alert. |<br />
+| <strong>Pregnancy Safety (Garbhini Avastha)</strong> | Administering emmenagogue, purgative, or heavy mineral formulations (e.g. <em>Chitrakadi Vati</em>, <em>Simhanada Guggulu</em>, <em>Kshara</em>) during gestation. | Checks <code>is_pregnant=True</code> against certified <code>pregnancy_safe</code> attribute for each prescribed compound. | <strong>Absolute Rejection</strong>: Strips contraindicated drugs and surfaces prominent red warning badge. |<br />
+| <strong>Pediatric Safety (Bala &lt; 12 yrs)</strong> | Prescribing adult dosages of Tikshna Rasa preparations to children. | Evaluates patient age against <code>pediatric_safe</code> flag and enforces Kashyapa Samhita pediatric dosage titrations. | <strong>Dosage Flag</strong>: Down-titrates dose and restricts non-pediatric formulations. |<br />
+| <strong>Incompatible Diet (Viruddha Ahara)</strong> | Co-prescribing or allowing diet pairs like Milk + Fish (<em>Samyoga Viruddha</em>) or equal parts Honey + Ghee (<em>Matra Viruddha</em>). | Scans dietary recommendations against the 18 classical forms of <em>Viruddha Ahara</em>. | <strong>Dietary Alert</strong>: Appends classical reference and clinical explanation to the Apathya list. |<br />
+| <strong>Seasonal Restrictions (Ritucharya)</strong> | Recommending Ushna/Tikshna formulations in Grishma (Summer) or Sheetala treatments in Hemanta/Shishira. | Cross-references patient <code>current_season</code> with the formulation's thermal potency (<em>Virya</em>). | <strong>Advisory Banner</strong>: Recommends seasonal vehicle modulation or dose reduction. |</p>
+<hr />
+<h2>6. Evaluation Framework &amp; Proposed Benchmark Metrics</h2>
+<p>To provide quantitative validation for the Phase 2 prototype and Phase 3 finale at IIT Bombay, AyurSetu establishes an objective benchmark suite:</p>
+<p>| Metric | Target Goal | Evaluation Methodology |<br />
+| :--- | :--- | :--- |<br />
+| <strong>Citation Precision@K</strong> | $\ge 96%$ | Proportion of retrieved and cited shlokas that directly correspond to authentic Brihat Trayi chapters for the diagnosed disease. |<br />
+| <strong>Zero-Hallucination Rate</strong> | $100%$ | Percentage of generated medical recommendations that successfully pass through AyurGuard citation and safety checks without fabricated verse keys. |<br />
+| <strong>Anupana Compliance</strong> | $100%$ | Proportion of prescriptions that pair each herb/compound with a classically approved vehicle. |<br />
+| <strong>Contraindication Catch Rate</strong> | $100%$ | Detection and blocking of simulated contraindications (pregnancy, pediatric, Viruddha Ahara test cases). |<br />
+| <strong>Inference Latency</strong> | $&lt; 1.2\text{ s}$ | End-to-end response time on quantized AyurParam 2.9B on standard hardware (single RTX 3060 / Apple M2 or CPU fallback). |</p>
+<hr />
+<h2>7. Working Prototype &amp; Open-Source Codebase Status</h2>
+<p>In anticipation of the Phase 1 submission and upcoming Phase 2 evaluation, a <strong>working proof-of-concept codebase is already established and verified</strong>:</p>
+<ul>
+<li><strong>Core Architecture</strong>: Modular Python package (<code>core/models.py</code>, <code>core/classical_corpus.py</code>, <code>core/rag_engine.py</code>, <code>core/guardrails.py</code>, <code>core/ayurparam_engine.py</code>).</li>
+<li><strong>REST API</strong>: Production-ready FastAPI service (<code>api/main.py</code>) exposing <code>/api/diagnose</code>, <code>/api/search</code>, <code>/api/verify-safety</code>, and <code>/api/viruddha-ahara</code>.</li>
+<li><strong>Interactive UI</strong>: Clean, responsive, multilingual dashboard (<code>static/index.html</code>) featuring:
+<ul>
+<li>Clinical Case Intake with presets for <em>Amavata</em>, <em>Grahani</em>, and <em>Prameha</em>.</li>
+<li>Real-time <em>Samprapti</em> decomposition and grounded <em>Chikitsa</em> cards.</li>
+<li>Interactive Classical Shloka Inspector with Devanagari Sanskrit, IAST, and translations.</li>
+<li>Interactive AyurGuard Safety Tester for real-time contraindication validation.</li>
+</ul>
+</li>
+<li><strong>Automated Test Suite</strong>: 100% passing unit and integration tests (<code>tests/test_pipeline.py</code>) verifying RAG retrieval, pregnancy contraindications, Anupana violations, and hallucination rejection.</li>
+</ul>
+<hr />
+<h2>8. Real-World Impact &amp; Deployment Roadmap</h2>
+<ol>
+<li><strong>Phase 1 (Current)</strong>: Architecture finalization, Brihat Trayi seed indexing, deterministic AyurGuard rule engine validation, proposal submission.</li>
+<li><strong>Phase 2 (1st Dec 2026)</strong>: Ingestion of full 8 Sthanas of Charaka Samhita and 6 Sthanas of Sushruta Samhita; fine-tuning evaluation of AyurParam 2.9B on NCISM BAMS clinical question-answer benchmarks; public deployment on HuggingFace Spaces and GitHub.</li>
+<li><strong>Phase 3 (15th–18th Dec 2026 @ IIT Bombay)</strong>: Live demonstration of real-time clinical consults before the expert jury (Ministry of Ayush, AIIA faculty, and IIT Bombay AI researchers).</li>
+</ol>
+<hr />
+<h2>9. Compliance with Competition Rules</h2>
+<ul>
+<li><strong>Team Composition</strong>: Structured to include at least one actively enrolled student pursuing BAMS / MD (Ayurveda) from an NCISM-recognized institution alongside engineering and computer science collaborators.</li>
+<li><strong>Model Mandate</strong>: Built around IIT Bombay’s open-source 2.9B <strong>AyurParam</strong> base architecture.</li>
+<li><strong>Open-Source Licensing</strong>: Permissive <strong>MIT License</strong> with comprehensive installation, API documentation, and reproducible evaluation test harnesses.</li>
+</ul>
+
+  </article>
+
+</body>
+</html>

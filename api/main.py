@@ -128,3 +128,4 @@ def get_corpus():
 def serve_dashboard():
     with open(os.path.join(os.path.dirname(__file__), "..", "static", "index.html"), "r", encoding="utf-8") as f:
         return f.read()
+

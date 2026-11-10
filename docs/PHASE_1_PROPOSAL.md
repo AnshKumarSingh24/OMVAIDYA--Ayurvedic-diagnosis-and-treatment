@@ -221,3 +221,4 @@ In anticipation of the Phase 1 submission and upcoming Phase 2 evaluation, a **w
 - **Team Composition**: Structured to include at least one actively enrolled student pursuing BAMS / MD (Ayurveda) from an NCISM-recognized institution alongside engineering and computer science collaborators.
 - **Model Mandate**: Built around IIT Bombay’s open-source 2.9B **AyurParam** base architecture.
 - **Open-Source Licensing**: Permissive **MIT License** with comprehensive installation, API documentation, and reproducible evaluation test harnesses.
+

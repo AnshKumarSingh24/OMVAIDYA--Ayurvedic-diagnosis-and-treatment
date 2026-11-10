@@ -178,3 +178,4 @@ class CanonicalRAGEngine:
                     relevance_score=1.0
                 )
         return None
+

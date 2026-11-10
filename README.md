@@ -138,3 +138,4 @@ Open your browser at:
 - **Team Requirement**: Designed for collaboration between engineering students and NCISM-enrolled **BAMS / MD (Ayurveda)** students.
 - **Deliverables**: Includes full Phase 1 Proposal document (`docs/PHASE_1_PROPOSAL.md`), modular open-source codebase, and comprehensive test suite.
 - **License**: Released under the permissive **MIT License**.
+

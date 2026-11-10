@@ -112,3 +112,4 @@ class ClinicalDiagnosticResponse(BaseModel):
     )
     citations: List[ShlokaCitation] = Field(default_factory=list, description="Grounded Brihat Trayi verses")
     safety_audit: SafetyAuditResult = Field(..., description="Deterministic safety evaluation")
+
