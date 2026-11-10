@@ -1,0 +1,81 @@
+/* ============================================================
+   AYUVAIDYA CLINICAL DESIGN SYSTEM
+   Vedic Green, Ancient Gold & Clean Clinical Slate
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary-green: #064e3b;
+  --secondary-green: #047857;
+  --accent-gold: #d97706;
+  --bg-app: #f8fafc;
+  --card-bg: #ffffff;
+  --border-subtle: #e2e8f0;
+}
+
+.dark {
+  --primary-green: #052e16;
+  --secondary-green: #065f46;
+  --accent-gold: #f59e0b;
+  --bg-app: #090d16;
+  --card-bg: #0f172a;
+  --border-subtle: #1e293b;
+}
+
+/* Glassmorphism Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+}
+
+.dark .glass-card {
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+/* Shloka Typography */
+.shloka-text {
+  font-family: 'Martel', serif;
+  line-height: 1.8;
+  letter-spacing: 0.02em;
+}
+
+/* Glow effects */
+.glow-emerald {
+  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.25);
+}
+
+.glow-gold {
+  box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.3);
+}
+

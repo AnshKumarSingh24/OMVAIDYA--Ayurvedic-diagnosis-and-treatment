@@ -1,141 +1,133 @@
-# AyurSetu (आयुर्सेतु)
-
-**National Open Ayurveda AI Challenge 2026–27 | Techfest, IIT Bombay**  
-*Organized in collaboration with the Ministry of Ayush & All India Institute of Ayurveda (AIIA)*
+# AyuVaidya (आयुवैद्य)
+**Source-Grounded Ayurvedic Clinical Decision Support & Classical Knowledge Retrieval System**  
+*National Open Ayurveda AI Challenge 2026–27 | Techfest, IIT Bombay in collaboration with the Ministry of Ayush & AIIA*
 
 ---
 
-## 🌿 Project Overview
+## 🌿 Executive Summary
 
-**AyurSetu** is an open-source, source-grounded Clinical Decision Support and Classical Treatise Retrieval System powered by **AyurParam** (IIT Bombay's open-source 2.9B Ayurveda LLM).
+**AyuVaidya** is an open-source, full-stack Clinical Decision Support System (CDSS) built specifically for qualified Vaidyas (BAMS/MD practitioners), Ayurvedic researchers, and clinical students.
 
-It bridges authentic Ayurvedic classical wisdom (*Brihat Trayi*: Charaka Samhita, Sushruta Samhita, Ashtanga Hridaya) with modern AI engineering, strictly enforcing **zero-hallucination shloka traceability** and **deterministic clinical contraindication guardrails**.
+It is powered by IIT Bombay's open-source 2.9B parameter **AyurParam** model, grounded in the classical *Brihat Trayi* (*Charaka Samhita*, *Sushruta Samhita*, and *Ashtanga Hridaya*), and protected by the **AyurGuard** deterministic medical safety firewall.
 
 ```
-                           AyurSetu Architecture
+                           AyuVaidya Full-Stack System Architecture
                            
-  +--------------------------------------------------------------------------+
-  |                   Multilingual Vaidya Dashboard UI                       |
-  |        (Patient Intake • Samprapti Visualizer • Classical Inspector)      |
-  +--------------------------------------------------------------------------+
-                                      │
-                                      ▼
-  +--------------------------------------------------------------------------+
-  |                          FastAPI REST Engine                             |
-  +--------------------------------------------------------------------------+
-                    │                                      │
-                    ▼                                      ▼
-  +-----------------------------------+  +-----------------------------------+
-  |   AyurParam 2.9B Reasoning Core   |  |     Canonical Brihat Trayi RAG    |
-  |  - Roganirnaya (Diagnosis)        |  |  - Charaka, Sushruta, Vagbhata    |
-  |  - Structured Samprapti Modeling  |  |  - Shloka-level verse metadata    |
-  |  - Chikitsa Sutra & Formulations  |  |  - Sanskrit (Devanagari & IAST)   |
-  +-----------------------------------+  +-----------------------------------+
-                    │                                      │
-                    └──────────────────┬───────────────────┘
-                                       ▼
-  +--------------------------------------------------------------------------+
-  |              AyurGuard Deterministic Safety Firewall (Zero-Trust)        |
-  |   • Anupana Compatibility Matrix        • Pregnancy (Garbhini) Filter    |
-  |   • Viruddha Ahara (Incompatible Diet)  • Pediatric (Bala) Warnings      |
-  |   • Citation Integrity & Authenticity   • Seasonal (Ritucharya) Checks   |
-  +--------------------------------------------------------------------------+
+  +-----------------------------------------------------------------------------------------+
+  |                        React 19 + Vite + Tailwind + Lucide Frontend                     |
+  |  • Clinical Dashboard       • Rogi-Roga Pariksha (Ashtavidha)  • Samprapti Modeler      |
+  |  • Chikitsa & Rx Planner    • Brihat Trayi Classical RAG       • AyurGuard Safety Audit |
+  |  • Recovery Time-Series     • Knowledge Graph Visualizer       • Vaidya Profile         |
+  +-----------------------------------------------------------------------------------------+
+                                              │
+                                              ▼ (JSON REST API via FastAPI)
+  +-----------------------------------------------------------------------------------------+
+  |                           FastAPI Backend & SQLite Database                             |
+  |  • /api/patients       • /api/consultations     • /api/graph     • /api/rag             |
+  |  • /api/safety         • /api/tracker           • /api/health                           |
+  +-----------------------------------------------------------------------------------------+
+                       │                                             │
+                       ▼                                             ▼
+  +------------------------------------------+  +------------------------------------------+
+  |        AyurParam (2.9B) Reasoner         |  |         Canonical Knowledge Core         |
+  |  - Roganirnaya (Differential Diagnosis)  |  |  - 53-Node Ayurvedic Knowledge Graph     |
+  |  - Automated Samprapti (6 Kriya Kala)    |  |  - Hybrid BM25 & Dense Brihat Trayi RAG  |
+  |  - Classical Chikitsa Sutra Derivation   |  |  - Exact Shloka Citations (Sanskrit/IAST)|
+  +------------------------------------------+  +------------------------------------------+
+                       │                                             │
+                       └──────────────────────┬──────────────────────┘
+                                              ▼
+  +-----------------------------------------------------------------------------------------+
+  |                     AyurGuard Deterministic Clinical Safety Firewall                    |
+  |   • Strict Anupana (Vehicle) Verification     • Garbhini (Pregnancy) Safety Filter      |
+  |   • 18 Classical Viruddha Ahara Incompatible Diet  • Pediatric (Bala) Dose Protection   |
+  |   • Zero-Hallucination Shloka Citation Verifier     • Ritucharya (Seasonal) Restraints  |
+  +-----------------------------------------------------------------------------------------+
 ```
 
 ---
 
-## 🚀 Key Features
+## 🚀 Key Clinical Capabilities
 
-1. **Source-Grounded Shloka Traceability**:
-   Every diagnostic claim, formulation recommendation, and treatment principle links directly to an immutable verse identifier (e.g. `CS_CHI_15_051`, `AH_CHI_21_042`) containing the original Sanskrit verse in Devanagari, IAST Romanization, and verified translation.
+1. **Vaidya Rogi-Roga Pariksha & Intake**:
+   - Ashtavidha Pariksha assessment (Nadi, Mutra, Mala, Jihwa, Shabda, Sparsha, Druk, Akruti).
+   - Constitutional Prakriti, Agni (digestive fire), Koshtha (bowel habit), and Bala evaluation.
 2. **Automated Samprapti Modeling**:
-   Structures patient symptoms into clinical etiopathogenesis:
-   - Aggravated *Doshas*
-   - Affected *Dhatus*
-   - *Agni* and *Ama* status
-   - *Srotas* and *Sroto-dushti* type (Sanga, Atipravritti, etc.)
-   - *Adhisthana* (site of manifestation)
-3. **AyurGuard Deterministic Safety Firewall**:
-   An independent rule engine outside the LLM that strictly blocks:
-   - Dangerous *Anupana* combinations (e.g. cold water with Guggulu).
-   - Contraindicated formulations during pregnancy (*Garbhini*) or infancy (*Bala*).
-   - Classical incompatible food combinations (*Viruddha Ahara*).
-   - Hallucinated or non-existent verse citations.
-4. **Offline & Edge Ready**:
-   Engineered to run locally on consumer-grade hardware (single GPU or CPU fallback) for rural and standalone clinic deployment.
+   - Detailed deconstruction of etiopathogenesis:
+     * *Dosha* (including sub-doshas like Vyana, Apana, Samana, Pachaka, Kledaka, Shleshaka).
+     * *Dushya* (Rasa, Rakta, Mamsa, Meda, Asthi, Majja, Shukra).
+     * *Agni* & *Ama* status.
+     * *Srotas* & *Sroto-dushti* type (Sanga, Atipravritti, Vimarga Gamana).
+     * *Adhisthana* (site of manifestation).
+   - Full 6-stage *Shat Kriya Kala* chronological progression (Sanchaya, Prakopa, Prasara, Sthana-Samshraya, Vyakti, Bheda).
+3. **Personalized Chikitsa Planning**:
+   - Treatment principles directly cited from classical verses.
+   - Formulations with dosage, *Bheshaja Kala* (timing), and approved *Anupana* (vehicle).
+   - Personalized *Pathya* (wholesome) & *Apathya* (strict contraindications) dietary plans.
+   - One-click Vaidya prescription printing.
+4. **Canonical Brihat Trayi RAG & Shloka Traceability**:
+   - Every recommendation maps directly to an authenticated verse identifier `[Treatise, Sthana, Adhyaya, Shloka]`.
+   - Devanagari Sanskrit verse, IAST Romanization, and verified English translation.
+5. **AyurGuard Deterministic Safety Firewall**:
+   - Zero-trust, rule-based verification running outside the LLM.
+   - Blocks unsafe vehicles (e.g. cold water with Guggulu).
+   - Enforces pregnancy restrictions on emmenagogue and purgative herbs.
+   - Checks 18 classical forms of *Viruddha Ahara* (incompatible food combinations).
+6. **Ayurvedic Knowledge Graph**:
+   - NetworkX ontology linking Diseases, Doshas, Dhatus, Srotas, Herbs, Formulations, and Shlokas.
+7. **Longitudinal Recovery Tracker**:
+   - Interactive Recharts charts tracking symptom severity reduction, Agni restoration, and Dosha balance over time.
 
 ---
 
-## 📁 Repository Structure
+## ⚡ Quickstart Guide
 
-```
-AYUSHTECH/
-├── api/
-│   ├── __init__.py
-│   └── main.py                 # FastAPI application endpoints & routes
-├── core/
-│   ├── __init__.py
-│   ├── models.py               # Pydantic v2 schemas for Clinical & Shloka models
-│   ├── classical_corpus.py     # Canonical Brihat Trayi dataset & safety catalog
-│   ├── rag_engine.py           # Hybrid BM25 & semantic classical retrieval
-│   ├── guardrails.py           # AyurGuard deterministic safety & Anupana firewall
-│   └── ayurparam_engine.py     # AyurParam (2.9B) reasoning & orchestration
-├── docs/
-│   └── PHASE_1_PROPOSAL.md     # Full Techfest Phase 1 Submission Proposal Paper
-├── static/
-│   └── index.html              # Interactive multilingual Vaidya web dashboard
-├── tests/
-│   ├── __init__.py
-│   └── test_pipeline.py        # Automated test suite (100% pass rate)
-├── requirements.txt            # Python dependencies
-└── README.md                   # Project overview & quickstart
-```
+### 1. Requirements
+- Python 3.10+
+- Node.js 18+
 
----
-
-## ⚡ Quickstart & Installation
-
-### 1. Prerequisites
-- Python 3.10+ (Tested on Python 3.13)
-- `pip`
-
-### 2. Install Dependencies
+### 2. Backend Setup
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 3. Run Automated Tests
-Verify RAG retrieval, pregnancy contraindications, Anupana rules, and hallucination detection:
 ```bash
 python -m unittest tests/test_pipeline.py
 ```
 
-### 4. Launch the Interactive Application
+### 4. Launch the Complete System
+**Option A: Unified Server (FastAPI serves both API and built Frontend)**:
 ```bash
-python -m uvicorn api.main:app --reload --port 8000
+python -m uvicorn backend.main:app --reload --port 8000
 ```
-Open your browser at:
-- **Interactive Web App**: [http://localhost:8000](http://localhost:8000)
-- **Interactive Swagger API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+Open [http://localhost:8000](http://localhost:8000)
+
+**Option B: Independent Development (FastAPI + Vite Dev Server)**:
+- Backend: `python -m uvicorn backend.main:app --reload --port 8000`
+- Frontend: `cd frontend && npm run dev` (Runs on `http://localhost:5173` with automatic API proxying)
 
 ---
 
-## 📑 API Endpoints Summary
+## 📑 API Endpoints
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `POST` | `/api/diagnose` | Complete Ayurvedic Roganirnaya, Samprapti modeling, and AyurGuard audit |
-| `GET` | `/api/search` | Hybrid RAG retrieval across Charaka, Sushruta, and Vagbhata |
-| `POST` | `/api/verify-safety` | Standalone AyurGuard drug safety and Anupana compatibility check |
-| `GET` | `/api/viruddha-ahara` | Catalog of 18 classical incompatible dietary combinations |
-| `GET` | `/api/health` | Health status and AyurParam / AyurGuard engine metadata |
+| `GET` | `/api/patients` | List registered patients with consultation status |
+| `POST` | `/api/patients` | Register new patient with Ashtavidha Pariksha |
+| `POST` | `/api/consultations/analyze` | AyurParam (2.9B) clinical diagnostic reasoning & Samprapti |
+| `GET` | `/api/graph/subgraph` | Knowledge graph nodes and links for visualizer |
+| `GET` | `/api/rag/search` | Hybrid RAG retrieval across Charaka, Sushruta, and Vagbhata |
+| `POST` | `/api/safety/verify` | Standalone AyurGuard drug safety and Anupana verification |
+| `GET` | `/api/safety/viruddha-ahara` | Catalog of 18 classical incompatible dietary rules |
+| `GET` | `/api/tracker/{patient_id}` | Longitudinal recovery logs for Recharts analytics |
+| `GET` | `/api/health` | System health and engine status |
 
 ---
 
 ## 🏆 Compliance with Techfest 2026–27 Rules
 
-- **Core Model**: Powered by IIT Bombay's open-source 2.9B **AyurParam** architecture.
-- **Team Requirement**: Designed for collaboration between engineering students and NCISM-enrolled **BAMS / MD (Ayurveda)** students.
-- **Deliverables**: Includes full Phase 1 Proposal document (`docs/PHASE_1_PROPOSAL.md`), modular open-source codebase, and comprehensive test suite.
+- **Core Model**: Grounded on IIT Bombay's open-source 2.9B **AyurParam** architecture.
+- **Team Eligibility**: Designed for collaboration between engineering students and NCISM-enrolled **BAMS / MD (Ayurveda)** students.
+- **Deliverables**: Comprehensive Phase 1 proposal document (`docs/PHASE_1_PROPOSAL.md`), print-ready submission document (`docs/AyurSetu_Phase1_Proposal.html`), working full-stack prototype, and 100% passing test harness.
 - **License**: Released under the permissive **MIT License**.
-

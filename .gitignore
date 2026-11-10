@@ -5,6 +5,9 @@ __pycache__/
 env/
 venv/
 .env
+*.db
+*.sqlite3
+frontend/node_modules/
 .idea/
 .vscode/
 *.egg-info/
