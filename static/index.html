@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AyurSetu: AyushTech Clinical & Classical AI Engine</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Yatra+One&family=Martel:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-sanskrit { font-family: 'Martel', serif; }
+    .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .gradient-ayur { background: linear-gradient(135deg, #0d3e26 0%, #175438 50%, #1e6945 100%); }
+    .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+  </style>
+</head>
+<body class="bg-stone-50 text-stone-800 min-h-screen flex flex-col">
+
+  <!-- Top Navigation Header -->
+  <header class="gradient-ayur text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-amber-400/20 border border-amber-300/40 flex items-center justify-center font-bold text-amber-300 text-xl shadow-inner">
+          ॐ
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold tracking-tight text-amber-200">AyurSetu</h1>
+            <span class="text-xs bg-emerald-500/30 text-emerald-200 border border-emerald-400/30 px-2 py-0.5 rounded-full font-medium">AyurParam 2.9B</span>
+          </div>
+          <p class="text-xs text-stone-300">National Open Ayurveda AI Challenge &bull; IIT Bombay &amp; Ministry of Ayush</p>
+        </div>
+      </div>
+
+      <!-- Quick Nav Tabs -->
+      <nav class="flex space-x-1 bg-black/20 p-1 rounded-xl backdrop-blur-sm border border-white/10 text-xs sm:text-sm font-medium">
+        <button onclick="switchTab('consult')" id="tab-consult" class="px-4 py-1.5 rounded-lg transition-all bg-amber-400 text-stone-900 font-semibold shadow">
+          Clinical Consultation
+        </button>
+        <button onclick="switchTab('corpus')" id="tab-corpus" class="px-4 py-1.5 rounded-lg transition-all text-stone-300 hover:text-white">
+          Classical Brihat Trayi RAG
+        </button>
+        <button onclick="switchTab('safety')" id="tab-safety" class="px-4 py-1.5 rounded-lg transition-all text-stone-300 hover:text-white">
+          AyurGuard Safety Audit
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Wrapper -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+    <!-- ============================================================== -->
+    <!-- TAB 1: CLINICAL CONSULTATION & SAMPRAPTI REASONING -->
+    <!-- ============================================================== -->
+    <section id="view-consult" class="space-y-6">
+      <!-- Intro Banner -->
+      <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-stone-900 flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+            Vaidya Clinical Decision &amp; Samprapti Support
+          </h2>
+          <p class="text-xs text-stone-500 mt-0.5">
+            Powered by AyurParam 2.9B with shloka-level citation verification and deterministic contraindication filtering.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 text-xs">
+          <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-lg font-medium">
+            Strict Brihat Trayi Grounding
+          </span>
+          <span class="bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-lg font-medium">
+            Zero-Hallucination Guardrails
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Patient Intake Form (5 cols) -->
+        <div class="lg:col-span-5 bg-white border border-stone-200 rounded-2xl p-6 shadow-sm space-y-4">
+          <div class="border-b border-stone-100 pb-3">
+            <h3 class="font-bold text-stone-800 text-sm tracking-wide uppercase text-stone-500">Patient Case Intake</h3>
+          </div>
+
+          <!-- Quick Presets -->
+          <div>
+            <label class="block text-xs font-semibold text-stone-600 mb-1.5">Load Clinical Test Cases:</label>
+            <div class="grid grid-cols-3 gap-2 text-xs">
+              <button onclick="loadPreset('amavata')" class="p-2 border border-emerald-200 bg-emerald-50 text-emerald-800 rounded-lg font-medium hover:bg-emerald-100 transition text-left">
+                Amavata Case
+              </button>
+              <button onclick="loadPreset('grahani')" class="p-2 border border-amber-200 bg-amber-50 text-amber-800 rounded-lg font-medium hover:bg-amber-100 transition text-left">
+                Grahani Case
+              </button>
+              <button onclick="loadPreset('prameha')" class="p-2 border border-indigo-200 bg-indigo-50 text-indigo-800 rounded-lg font-medium hover:bg-indigo-100 transition text-left">
+                Prameha Case
+              </button>
+            </div>
+          </div>
+
+          <form id="consult-form" onsubmit="handleConsultSubmit(event)" class="space-y-3.5 text-xs">
+            <!-- Chief Complaints -->
+            <div>
+              <label class="block font-semibold text-stone-700 mb-1">Chief Complaints / Symptoms (Lakshanas):</label>
+              <textarea id="inp-complaints" rows="3" required class="w-full border border-stone-300 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="e.g. Severe morning joint stiffness, swelling in knees, fatigue, reduced appetite..."></textarea>
+            </div>
+
+            <!-- Demographics Grid -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-stone-700 mb-1">Age (Years):</label>
+                <input type="number" id="inp-age" value="38" min="1" max="110" class="w-full border border-stone-300 rounded-xl p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              </div>
+              <div>
+                <label class="block font-semibold text-stone-700 mb-1">Gender:</label>
+                <select id="inp-gender" class="w-full border border-stone-300 rounded-xl p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                  <option value="Female">Female</option>
+                  <option value="Male">Male</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Clinical State -->
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="block font-semibold text-stone-700 mb-1">Prakriti:</label>
+                <select id="inp-prakriti" class="w-full border border-stone-300 rounded-xl p-1.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                  <option value="Vata-Kapha">Vata-Kapha</option>
+                  <option value="Vata-Pitta">Vata-Pitta</option>
+                  <option value="Pitta-Kapha">Pitta-Kapha</option>
+                  <option value="Vata">Vata</option>
+                  <option value="Pitta">Pitta</option>
+                  <option value="Kapha">Kapha</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold text-stone-700 mb-1">Agni:</label>
+                <select id="inp-agni" class="w-full border border-stone-300 rounded-xl p-1.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                  <option value="Mandagni (Sluggish / Kapha dominant)">Mandagni</option>
+                  <option value="Vishamagni (Irregular / Vata dominant)">Vishamagni</option>
+                  <option value="Tikshnagni (Hyperactive / Pitta dominant)">Tikshnagni</option>
+                  <option value="Samagni (Balanced)">Samagni</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-semibold text-stone-700 mb-1">Koshtha:</label>
+                <select id="inp-koshtha" class="w-full border border-stone-300 rounded-xl p-1.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                  <option value="Madhyama (Moderate)">Madhyama</option>
+                  <option value="Krura (Hard / Constipated)">Krura</option>
+                  <option value="Mridu (Soft / Sensitive)">Mridu</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Safety Vulnerability Checkbox -->
+            <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3 space-y-2">
+              <span class="block font-bold text-amber-900 text-[11px] uppercase tracking-wider">Vulnerable Demographics Safety</span>
+              <label class="flex items-center space-x-2 text-stone-700 cursor-pointer">
+                <input type="checkbox" id="inp-pregnant" class="rounded text-amber-600 focus:ring-amber-500">
+                <span class="font-medium">Patient is Pregnant (Garbhini)</span>
+              </label>
+              <label class="flex items-center space-x-2 text-stone-700 cursor-pointer">
+                <input type="checkbox" id="inp-lactating" class="rounded text-amber-600 focus:ring-amber-500">
+                <span class="font-medium">Patient is Lactating (Sutika)</span>
+              </label>
+            </div>
+
+            <button type="submit" id="btn-submit" class="w-full bg-emerald-800 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow flex items-center justify-center gap-2 text-sm">
+              <span>Generate Roganirnaya &amp; Grounded Plan</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- Output Pane (7 cols) -->
+        <div class="lg:col-span-7 space-y-4">
+          <!-- Empty State -->
+          <div id="result-empty" class="bg-white border border-stone-200 rounded-2xl p-12 text-center shadow-sm">
+            <div class="w-16 h-16 bg-stone-100 rounded-2xl mx-auto flex items-center justify-center text-stone-400 mb-3 text-2xl font-bold">
+              ⚕
+            </div>
+            <h4 class="font-bold text-stone-700">No Patient Case Analyzed Yet</h4>
+            <p class="text-xs text-stone-500 max-w-sm mx-auto mt-1">
+              Select one of the clinical presets or enter patient symptoms on the left to trigger the AyurParam reasoning and AyurGuard audit.
+            </p>
+          </div>
+
+          <!-- Loading State -->
+          <div id="result-loading" class="hidden bg-white border border-stone-200 rounded-2xl p-12 text-center shadow-sm">
+            <div class="animate-spin w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <h4 class="font-bold text-stone-800">Processing with AyurParam 2.9B...</h4>
+            <p class="text-xs text-stone-500 mt-1">Cross-referencing Brihat Trayi verses &amp; verifying AyurGuard safety rules</p>
+          </div>
+
+          <!-- Populated Result View -->
+          <div id="result-content" class="hidden space-y-4">
+            
+            <!-- Diagnosis & Safety Header -->
+            <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-3">
+                <div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-stone-400">Ayurvedic Roganirnaya (Diagnosis)</span>
+                  <h3 id="res-vyadhi" class="text-lg font-bold text-emerald-950"></h3>
+                </div>
+                <div id="res-safety-badge"></div>
+              </div>
+
+              <p id="res-summary" class="text-xs text-stone-600 leading-relaxed"></p>
+
+              <!-- Safety Alerts If Any -->
+              <div id="res-safety-alerts" class="hidden rounded-xl p-3 text-xs space-y-1"></div>
+            </div>
+
+            <!-- Structured Samprapti Ghatakas -->
+            <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm space-y-3">
+              <h4 class="font-bold text-stone-800 text-xs uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                Samprapti Ghatakas (Pathology Breakdown)
+              </h4>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
+                <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-100">
+                  <span class="block text-[10px] font-bold text-stone-400 uppercase">Aggravated Doshas</span>
+                  <span id="res-samp-dosha" class="font-semibold text-stone-800"></span>
+                </div>
+                <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-100">
+                  <span class="block text-[10px] font-bold text-stone-400 uppercase">Affected Dhatus</span>
+                  <span id="res-samp-dushya" class="font-semibold text-stone-800"></span>
+                </div>
+                <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-100">
+                  <span class="block text-[10px] font-bold text-stone-400 uppercase">Agni &amp; Ama Status</span>
+                  <span id="res-samp-agni" class="font-semibold text-stone-800"></span>
+                </div>
+                <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-100">
+                  <span class="block text-[10px] font-bold text-stone-400 uppercase">Affected Srotas</span>
+                  <span id="res-samp-srotas" class="font-semibold text-stone-800"></span>
+                </div>
+                <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-100">
+                  <span class="block text-[10px] font-bold text-stone-400 uppercase">Sroto-Dushti Type</span>
+                  <span id="res-samp-dushti" class="font-semibold text-stone-800"></span>
+                </div>
+                <div class="p-2.5 bg-stone-50 rounded-xl border border-stone-100">
+                  <span class="block text-[10px] font-bold text-stone-400 uppercase">Adhisthana (Site)</span>
+                  <span id="res-samp-adhisthana" class="font-semibold text-stone-800"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Treatment Principle (Chikitsa Sutra) & Formulations -->
+            <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm space-y-3">
+              <div class="border-b border-stone-100 pb-2">
+                <span class="text-[10px] font-bold text-stone-400 uppercase tracking-wider">Governing Chikitsa Sutra</span>
+                <p id="res-sutra" class="text-xs font-semibold text-emerald-900 mt-0.5"></p>
+              </div>
+
+              <div>
+                <span class="block text-[10px] font-bold text-stone-400 uppercase tracking-wider mb-2">Verified Formulations</span>
+                <div id="res-formulations" class="space-y-2"></div>
+              </div>
+
+              <!-- Diet & Lifestyle -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 text-xs">
+                  <span class="font-bold text-emerald-900 block mb-1">Pathya (Wholesome Regimen)</span>
+                  <ul id="res-pathya" class="list-disc list-inside text-stone-600 space-y-0.5"></ul>
+                </div>
+                <div class="p-3 bg-rose-50/50 rounded-xl border border-rose-100 text-xs">
+                  <span class="font-bold text-rose-900 block mb-1">Apathya (Strict Restrictions)</span>
+                  <ul id="res-apathya" class="list-disc list-inside text-stone-600 space-y-0.5"></ul>
+                </div>
+              </div>
+            </div>
+
+            <!-- Classical Brihat Trayi Citations -->
+            <div class="bg-stone-900 text-stone-100 rounded-2xl p-5 shadow-sm space-y-3">
+              <div class="flex items-center justify-between border-b border-stone-800 pb-2">
+                <h4 class="font-bold text-xs uppercase tracking-wider text-amber-300 flex items-center gap-2">
+                  <span>📜</span>
+                  Authenticated Shloka Citations (Brihat Trayi)
+                </h4>
+                <span class="text-[10px] bg-stone-800 text-stone-300 px-2 py-0.5 rounded">Source-Grounded</span>
+              </div>
+              <div id="res-citations" class="space-y-3 text-xs"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- TAB 2: CLASSICAL BRIHAT TRAYI RAG EXPLORER -->
+    <!-- ============================================================== -->
+    <section id="view-corpus" class="hidden space-y-6">
+      <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm">
+        <h2 class="text-lg font-bold text-stone-900">Classical Brihat Trayi Retrieval Engine</h2>
+        <p class="text-xs text-stone-500 mt-1">
+          Perform granular hybrid searches across the authenticated treatises (Charaka Samhita, Sushruta Samhita, Ashtanga Hridaya) with Sanskrit transliteration and translation.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="mt-4 flex flex-col sm:flex-row gap-2">
+          <input type="text" id="corpus-query" placeholder="Search keywords: 'Jwara', 'Agni', 'Vatavyadhi', 'Simhanada Guggulu', 'Charaka Sutra'..." class="flex-1 border border-stone-300 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <select id="corpus-treatise-filter" class="border border-stone-300 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <option value="">All Treatises (Brihat Trayi)</option>
+            <option value="Charaka Samhita">Charaka Samhita</option>
+            <option value="Sushruta Samhita">Sushruta Samhita</option>
+            <option value="Ashtanga Hridaya">Ashtanga Hridaya</option>
+          </select>
+          <button onclick="executeCorpusSearch()" class="bg-emerald-800 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition">
+            Search Verses
+          </button>
+        </div>
+      </div>
+
+      <!-- Corpus Results -->
+      <div id="corpus-results" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- TAB 3: AYURGUARD DETERMINISTIC SAFETY AUDIT -->
+    <!-- ============================================================== -->
+    <section id="view-safety" class="hidden space-y-6">
+      <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm">
+        <h2 class="text-lg font-bold text-stone-900">AyurGuard Safety Firewall &amp; Anupana Validator</h2>
+        <p class="text-xs text-stone-500 mt-1">
+          Test formulation safety, Anupana compatibility, and contraindications against the deterministic clinical rules matrix.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <!-- Interactive Tester (5 cols) -->
+        <div class="md:col-span-5 bg-white border border-stone-200 rounded-2xl p-5 shadow-sm space-y-4">
+          <h3 class="font-bold text-stone-800 text-xs uppercase tracking-wider border-b border-stone-100 pb-2">
+            Drug Safety Tester
+          </h3>
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="block font-semibold text-stone-700 mb-1">Formulation:</label>
+              <select id="test-formulation" class="w-full border border-stone-300 rounded-xl p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                <option value="Simhanada Guggulu">Simhanada Guggulu (Contains Castor oil &amp; Guggulu)</option>
+                <option value="Chitrakadi Vati">Chitrakadi Vati (Contains Chitraka &amp; Alkalis)</option>
+                <option value="Chandraprabha Vati">Chandraprabha Vati (Contains Shilajit &amp; Guggulu)</option>
+                <option value="Punarnava Mandur">Punarnava Mandur (Contains Iron Bhasma)</option>
+                <option value="Yogaraj Guggulu">Yogaraj Guggulu (Contains Guggulu)</option>
+                <option value="Sudarshana Churna">Sudarshana Churna (Bitter antipyretic)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-semibold text-stone-700 mb-1">Vehicle / Anupana to test:</label>
+              <input type="text" id="test-anupana" value="Cold Water" class="w-full border border-stone-300 rounded-xl p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" placeholder="e.g. Warm water, Cold water, Milk, Curd...">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-semibold text-stone-700 mb-1">Patient Age:</label>
+                <input type="number" id="test-age" value="8" class="w-full border border-stone-300 rounded-xl p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              </div>
+              <div class="flex items-center pt-5">
+                <label class="flex items-center space-x-2 text-stone-700 cursor-pointer">
+                  <input type="checkbox" id="test-pregnant" checked class="rounded text-amber-600 focus:ring-amber-500">
+                  <span class="font-medium text-xs">Pregnant (Garbhini)</span>
+                </label>
+              </div>
+            </div>
+
+            <button onclick="testSafetyEndpoint()" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2.5 rounded-xl transition text-xs shadow">
+              Run AyurGuard Audit
+            </button>
+          </div>
+
+          <!-- Audit Output -->
+          <div id="test-output" class="hidden p-4 rounded-xl text-xs space-y-2 border"></div>
+        </div>
+
+        <!-- Viruddha Ahara Reference Table (7 cols) -->
+        <div class="md:col-span-7 bg-white border border-stone-200 rounded-2xl p-5 shadow-sm space-y-3">
+          <h3 class="font-bold text-stone-800 text-xs uppercase tracking-wider border-b border-stone-100 pb-2">
+            Canonical Incompatible Food Combinations (Viruddha Ahara)
+          </h3>
+          <p class="text-xs text-stone-500">
+            Enforced by AyurGuard to prevent diet-drug toxicity and channel obstruction.
+          </p>
+          <div id="viruddha-list" class="space-y-2.5 text-xs"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-stone-200 py-4 text-center text-xs text-stone-500">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>AyurSetu: Open-source, Source-Grounded Ayurveda AI Architecture | Techfest 2026-27 National Challenge</p>
+      <p class="text-[11px] text-stone-400 mt-0.5">Licensed under MIT Open Source. Designed for NCISM Vaidyas and Ayurvedic Researchers.</p>
+    </div>
+  </footer>
+
+  <!-- Client-side Logic -->
+  <script>
+    // Tab Switching
+    function switchTab(tab) {
+      ['consult', 'corpus', 'safety'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-${t}`);
+        btn.classList.remove('bg-amber-400', 'text-stone-900', 'font-semibold', 'shadow');
+        btn.classList.add('text-stone-300');
+      });
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tab}`);
+      activeBtn.classList.add('bg-amber-400', 'text-stone-900', 'font-semibold', 'shadow');
+      activeBtn.classList.remove('text-stone-300');
+
+      if (tab === 'corpus') executeCorpusSearch();
+      if (tab === 'safety') loadViruddhaAhara();
+    }
+
+    // Presets Loader
+    function loadPreset(type) {
+      if (type === 'amavata') {
+        document.getElementById('inp-complaints').value = "Severe morning stiffness in bilateral knee and wrist joints, pain aggravated by cold weather, lack of appetite, feeling of heavy limbs (Gaurava).";
+        document.getElementById('inp-age').value = 42;
+        document.getElementById('inp-gender').value = "Female";
+        document.getElementById('inp-prakriti').value = "Vata-Kapha";
+        document.getElementById('inp-agni').value = "Mandagni (Sluggish / Kapha dominant)";
+        document.getElementById('inp-pregnant').checked = false;
+      } else if (type === 'grahani') {
+        document.getElementById('inp-complaints').value = "Alternating loose and formed stools, abdominal bloating after meals, gurgling sounds, indigestion, fatigue.";
+        document.getElementById('inp-age').value = 34;
+        document.getElementById('inp-gender').value = "Male";
+        document.getElementById('inp-prakriti').value = "Vata-Pitta";
+        document.getElementById('inp-agni').value = "Vishamagni (Irregular / Vata dominant)";
+        document.getElementById('inp-pregnant').checked = false;
+      } else if (type === 'prameha') {
+        document.getElementById('inp-complaints').value = "Frequent turbid urination, excessive thirst, sweetness in mouth, lethargy, burning sensation in palms and soles.";
+        document.getElementById('inp-age').value = 54;
+        document.getElementById('inp-gender').value = "Male";
+        document.getElementById('inp-prakriti').value = "Kapha";
+        document.getElementById('inp-agni').value = "Mandagni (Sluggish / Kapha dominant)";
+        document.getElementById('inp-pregnant').checked = false;
+      }
+    }
+
+    // Clinical Consult Form Handler
+    async function handleConsultSubmit(e) {
+      e.preventDefault();
+      document.getElementById('result-empty').classList.add('hidden');
+      document.getElementById('result-content').classList.add('hidden');
+      document.getElementById('result-loading').classList.remove('hidden');
+
+      const payload = {
+        age: parseInt(document.getElementById('inp-age').value),
+        gender: document.getElementById('inp-gender').value,
+        is_pregnant: document.getElementById('inp-pregnant').checked,
+        is_lactating: document.getElementById('inp-lactating').checked,
+        prakriti: document.getElementById('inp-prakriti').value,
+        agni: document.getElementById('inp-agni').value,
+        koshtha: document.getElementById('inp-koshtha').value,
+        chief_complaints: [document.getElementById('inp-complaints').value],
+        current_season: "Hemanta (Early Winter)"
+      };
+
+      try {
+        const res = await fetch('/api/diagnose', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        renderConsultResult(data);
+      } catch (err) {
+        alert("Consultation failed: " + err);
+      } finally {
+        document.getElementById('result-loading').classList.add('hidden');
+      }
+    }
+
+    function renderConsultResult(data) {
+      document.getElementById('result-content').classList.remove('hidden');
+
+      document.getElementById('res-vyadhi').textContent = data.probable_vyadhi;
+      document.getElementById('res-summary').textContent = data.roganirnaya_summary;
+
+      // Safety Badge
+      const isSafe = data.safety_audit.is_safe;
+      const badge = document.getElementById('res-safety-badge');
+      if (isSafe) {
+        badge.innerHTML = `<span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-600"></span> AyurGuard Certified Safe
+        </span>`;
+      } else {
+        badge.innerHTML = `<span class="bg-rose-100 text-rose-800 border border-rose-300 px-3 py-1 rounded-xl text-xs font-bold flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-rose-600"></span> AyurGuard Clinical Warning
+        </span>`;
+      }
+
+      // Alerts
+      const alertsContainer = document.getElementById('res-safety-alerts');
+      alertsContainer.innerHTML = '';
+      if (data.safety_audit.contraindications_detected.length > 0 || data.safety_audit.warnings.length > 0) {
+        alertsContainer.classList.remove('hidden');
+        alertsContainer.className = 'bg-rose-50 border border-rose-200 text-rose-900 rounded-xl p-3 text-xs space-y-1';
+        data.safety_audit.contraindications_detected.forEach(c => {
+          alertsContainer.innerHTML += `<div class="font-bold flex items-start gap-1.5"><span>⚠️</span> <span>${c}</span></div>`;
+        });
+        data.safety_audit.warnings.forEach(w => {
+          alertsContainer.innerHTML += `<div class="text-stone-700 flex items-start gap-1.5"><span>ℹ️</span> <span>${w}</span></div>`;
+        });
+      } else {
+        alertsContainer.classList.add('hidden');
+      }
+
+      // Samprapti
+      document.getElementById('res-samp-dosha').textContent = data.samprapti.dosha.join(", ");
+      document.getElementById('res-samp-dushya').textContent = data.samprapti.dushya.join(", ");
+      document.getElementById('res-samp-agni').textContent = data.samprapti.agni;
+      document.getElementById('res-samp-srotas').textContent = data.samprapti.srotas.join(", ");
+      document.getElementById('res-samp-dushti').textContent = data.samprapti.sroto_dushti_prakara;
+      document.getElementById('res-samp-adhisthana').textContent = data.samprapti.adhisthana;
+
+      // Treatment Principle
+      document.getElementById('res-sutra').textContent = data.chikitsa_sutra;
+
+      // Formulations
+      const formContainer = document.getElementById('res-formulations');
+      formContainer.innerHTML = '';
+      data.recommended_formulations.forEach(f => {
+        formContainer.innerHTML += `
+          <div class="p-3 bg-stone-50 border border-stone-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <div>
+              <div class="font-bold text-stone-900">${f.name} <span class="text-stone-500 font-normal">(${f.form})</span></div>
+              <div class="text-[11px] text-stone-600 mt-0.5">Dosage: ${f.dosage} &bull; Kala: ${f.kala}</div>
+            </div>
+            <div class="text-right sm:text-right">
+              <span class="inline-block bg-amber-100 text-amber-900 border border-amber-300 font-semibold px-2 py-0.5 rounded text-[11px]">
+                Anupana: ${f.anupana}
+              </span>
+              <div class="text-[10px] text-stone-500 mt-0.5">Ref: ${f.classical_reference.shloka_id}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      // Pathya / Apathya
+      const pList = document.getElementById('res-pathya');
+      pList.innerHTML = '';
+      (data.pathya_apathya["Pathya (Wholesome)"] || []).forEach(p => {
+        pList.innerHTML += `<li>${p}</li>`;
+      });
+
+      const aList = document.getElementById('res-apathya');
+      aList.innerHTML = '';
+      (data.pathya_apathya["Apathya (Unwholesome)"] || []).forEach(a => {
+        aList.innerHTML += `<li>${a}</li>`;
+      });
+
+      // Citations
+      const citContainer = document.getElementById('res-citations');
+      citContainer.innerHTML = '';
+      data.citations.forEach(c => {
+        citContainer.innerHTML += `
+          <div class="p-3.5 bg-stone-800/80 border border-stone-700 rounded-xl space-y-1.5">
+            <div class="flex items-center justify-between text-amber-300 text-[11px] font-semibold">
+              <span>${c.treatise} &bull; ${c.sthana} &bull; ${c.adhyaya} (Shloka ${c.shloka_number})</span>
+              <span class="font-mono bg-stone-900 px-1.5 py-0.5 rounded border border-stone-700 text-stone-400">${c.shloka_id}</span>
+            </div>
+            <div class="text-sm font-sanskrit text-amber-100 tracking-wide leading-relaxed font-semibold">
+              ${c.sanskrit_devanagari}
+            </div>
+            <div class="text-[11px] text-stone-300 italic font-mono">
+              "${c.sanskrit_iast}"
+            </div>
+            <div class="text-xs text-stone-200 pt-1 border-t border-stone-700/60">
+              <span class="font-semibold text-stone-400">Translation:</span> ${c.english_translation}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Corpus Search
+    async function executeCorpusSearch() {
+      const q = document.getElementById('corpus-query').value || "Jwara";
+      const treatise = document.getElementById('corpus-treatise-filter').value;
+      const url = `/api/search?q=${encodeURIComponent(q)}&top_k=6${treatise ? `&treatise=${encodeURIComponent(treatise)}` : ''}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const container = document.getElementById('corpus-results');
+        container.innerHTML = '';
+
+        if (data.length === 0) {
+          container.innerHTML = `<div class="col-span-2 text-center p-8 bg-white border rounded-2xl text-stone-500">No classical verses found matching query.</div>`;
+          return;
+        }
+
+        data.forEach(c => {
+          container.innerHTML += `
+            <div class="bg-white border border-stone-200 rounded-2xl p-5 shadow-sm space-y-2.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-emerald-800">${c.treatise} &bull; ${c.sthana}</span>
+                <span class="font-mono bg-stone-100 px-2 py-0.5 rounded text-[10px] text-stone-600 font-bold border border-stone-200">${c.shloka_id}</span>
+              </div>
+              <div class="text-xs font-semibold text-stone-500">${c.adhyaya} (Verse ${c.shloka_number})</div>
+              <div class="text-sm font-sanskrit text-stone-900 font-bold bg-amber-50/50 p-2.5 rounded-xl border border-amber-200/60">
+                ${c.sanskrit_devanagari}
+              </div>
+              <div class="text-xs text-stone-600 italic">
+                "${c.sanskrit_iast}"
+              </div>
+              <p class="text-xs text-stone-700 pt-1.5 border-t border-stone-100">
+                <strong>Meaning:</strong> ${c.english_translation}
+              </p>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Viruddha Ahara Loader
+    async function loadViruddhaAhara() {
+      try {
+        const res = await fetch('/api/viruddha-ahara');
+        const data = await res.json();
+        const container = document.getElementById('viruddha-list');
+        container.innerHTML = '';
+        data.rules.forEach(r => {
+          container.innerHTML += `
+            <div class="p-3 bg-stone-50 border border-stone-200 rounded-xl space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-rose-900">${r.pair.join(" + ")}</span>
+                <span class="text-[10px] font-mono text-stone-500">${r.reference}</span>
+              </div>
+              <p class="text-stone-600 text-xs">${r.reason}</p>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Safety Tester
+    async function testSafetyEndpoint() {
+      const form = document.getElementById('test-formulation').value;
+      const anupana = document.getElementById('test-anupana').value;
+      const age = document.getElementById('test-age').value;
+      const isPregnant = document.getElementById('test-pregnant').checked;
+
+      const url = `/api/verify-safety?formulation=${encodeURIComponent(form)}&anupana=${encodeURIComponent(anupana)}&age=${age}&is_pregnant=${isPregnant}`;
+
+      try {
+        const res = await fetch(url, { method: 'POST' });
+        const data = await res.json();
+        const box = document.getElementById('test-output');
+        box.classList.remove('hidden');
+
+        if (data.is_safe) {
+          box.className = 'p-4 rounded-xl text-xs space-y-2 border bg-emerald-50 border-emerald-300 text-emerald-950';
+          box.innerHTML = `
+            <div class="font-bold text-sm text-emerald-800 flex items-center gap-1.5">
+              <span>✅</span> <span>AyurGuard Audit: APPROVED</span>
+            </div>
+            <p>Formulation '${data.formulation}' with vehicle '${data.anupana_evaluated}' is safe for this profile.</p>
+          `;
+        } else {
+          box.className = 'p-4 rounded-xl text-xs space-y-2 border bg-rose-50 border-rose-300 text-rose-950';
+          box.innerHTML = `
+            <div class="font-bold text-sm text-rose-800 flex items-center gap-1.5">
+              <span>🚫</span> <span>AyurGuard Audit: REJECTED / CONTRAINDICATED</span>
+            </div>
+            <div class="space-y-1 mt-1 font-semibold">
+              ${data.contraindications.map(c => `<div>• ${c}</div>`).join('')}
+            </div>
+          `;
+        }
+
+        if (data.warnings && data.warnings.length > 0) {
+          box.innerHTML += `
+            <div class="text-stone-700 pt-2 border-t border-stone-200">
+              <span class="font-bold">Advisories:</span>
+              ${data.warnings.map(w => `<div>• ${w}</div>`).join('')}
+            </div>
+          `;
+        }
+      } catch (err) {
+        alert("Safety test failed: " + err);
+      }
+    }
+  </script>
+</body>
+</html>
