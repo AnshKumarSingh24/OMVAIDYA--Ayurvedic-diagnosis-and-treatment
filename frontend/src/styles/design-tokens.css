@@ -1,0 +1,559 @@
+/* ============================================================
+   AYUVAIDYA DESIGN SYSTEM TOKENS (GUTBALANCE VISUAL ARCHITECTURE)
+   Deep Indigo Atmosphere, Vivid Mint Green & Solar Orange Accents
+   ============================================================ */
+
+:root,
+[data-theme="dark"] {
+  --gb-bg-deep: #171342;
+  --gb-bg-deeper: #111038;
+  --gb-purple-dark: #241b54;
+  --gb-purple: #3d2d84;
+  --gb-purple-mid: #4a3896;
+  --gb-purple-light: #6653b8;
+  --gb-surface: rgba(32, 25, 79, 0.92);
+  --gb-surface-raised: rgba(58, 45, 116, 0.72);
+  --gb-surface-soft: rgba(255, 255, 255, 0.06);
+  --gb-border: rgba(167, 139, 250, 0.34);
+  --gb-border-strong: rgba(167, 139, 250, 0.55);
+  --gb-white: #f8fafc;
+  --gb-muted: #cbd5e1;
+  --gb-dim: #94a3b8;
+  --gb-mint: #4ade80;
+  --gb-mint-bright: #6ee7a0;
+  --gb-orange: #f97316;
+  --gb-orange-light: #fb923c;
+  --gb-violet: #a78bfa;
+  --gb-cyan: #38bdf8;
+  --gb-danger: #fb7185;
+  --gb-warning: #fbbf24;
+  --gb-focus: #86efac;
+  --gb-radius-sm: 8px;
+  --gb-radius-md: 14px;
+  --gb-radius-lg: 22px;
+  --gb-radius-pill: 999px;
+  --gb-shadow: 0 16px 40px rgba(7, 5, 35, 0.34);
+  --gb-shadow-soft: 0 8px 24px rgba(7, 5, 35, 0.22);
+
+  --app-bg: #171342;
+  --app-text: #f8fafc;
+  --card-bg: rgba(32, 25, 79, 0.88);
+  --card-border: rgba(167, 139, 250, 0.28);
+}
+
+[data-theme="light"] {
+  --gb-bg-deep: #f8f9fc;
+  --gb-bg-deeper: #eef2f6;
+  --gb-purple-dark: #312e81;
+  --gb-purple: #4338ca;
+  --gb-purple-mid: #4f46e5;
+  --gb-purple-light: #6366f1;
+  --gb-surface: #ffffff;
+  --gb-surface-raised: #f1f5f9;
+  --gb-surface-soft: rgba(79, 70, 229, 0.05);
+  --gb-border: #e2e8f0;
+  --gb-border-strong: #cbd5e1;
+  --gb-white: #0f172a;
+  --gb-muted: #334155;
+  --gb-dim: #64748b;
+  --gb-mint: #15803d;
+  --gb-mint-bright: #16a34a;
+  --gb-orange: #c2410c;
+  --gb-orange-light: #ea580c;
+  --gb-violet: #6d28d9;
+  --gb-cyan: #0284c7;
+  --gb-danger: #be123c;
+  --gb-warning: #b45309;
+  --gb-focus: #15803d;
+  --gb-radius-sm: 8px;
+  --gb-radius-md: 14px;
+  --gb-radius-lg: 22px;
+  --gb-radius-pill: 999px;
+  --gb-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --gb-shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+  --app-bg: #f8f9fc;
+  --app-text: #0f172a;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+}
+
+/* ============================================================
+   3D Offset-Block Button System
+   Same website colors — chunky dark offset shadow gives a
+   comic/street-art pressed-block 3D depth (like the reference).
+   Hover = button lifts up + shadow grows.
+   Active = button presses down + shadow shrinks.
+   ============================================================ */
+.gb-chamfer-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  border-radius: 10px;
+  cursor: pointer;
+  /* base shift so the shadow block is always visible */
+  transform: translate(-3px, -3px);
+  transition: transform 0.1s ease,
+              box-shadow 0.1s ease,
+              filter 0.15s ease;
+  user-select: none;
+  white-space: nowrap;
+  outline: none;
+  overflow: visible;   /* must be visible so offset shadow isn't clipped */
+  min-width: 0;
+}
+
+.gb-chamfer-btn:focus-visible {
+  outline: 2px solid #4ade80;
+  outline-offset: 3px;
+}
+
+/* Hover: lift further, shadow grows */
+.gb-chamfer-btn:hover:not(:disabled) {
+  transform: translate(-5px, -5px);
+}
+
+/* Active / press: sink into the shadow */
+.gb-chamfer-btn:active:not(:disabled) {
+  transform: translate(0px, 0px) !important;
+}
+
+/* ── PRIMARY: Mint Green fill ──
+   Shadow = dark forest green → visible against dark bg AND green fill */
+.gb-chamfer-btn-primary {
+  background: #4ade80;
+  color: #0b1a2b !important;
+  border: 2.5px solid #15803d;
+  box-shadow: 4px 4px 0 #15803d;
+}
+.gb-chamfer-btn-primary:hover:not(:disabled) {
+  background: #6ee7a0;
+  box-shadow: 6px 6px 0 #15803d;
+}
+.gb-chamfer-btn-primary:active:not(:disabled) {
+  box-shadow: 0px 0px 0 #15803d !important;
+}
+
+/* ── ORANGE: Solid orange fill ──
+   Shadow = dark brick orange → visible against dark bg AND orange fill */
+.gb-chamfer-btn-orange {
+  background: #f97316;
+  color: #ffffff !important;
+  border: 2.5px solid #7c2d12;
+  box-shadow: 4px 4px 0 #7c2d12;
+}
+.gb-chamfer-btn-orange:hover:not(:disabled) {
+  background: #fb923c;
+  box-shadow: 6px 6px 0 #7c2d12;
+}
+.gb-chamfer-btn-orange:active:not(:disabled) {
+  box-shadow: 0px 0px 0 #7c2d12 !important;
+}
+
+/* ── GHOST: Transparent bg, mint border + text ──
+   Shadow = bright mint → already highly visible ✓ */
+.gb-chamfer-btn-ghost {
+  background: rgba(74,222,128,0.07);
+  color: #4ade80 !important;
+  border: 2.5px solid #4ade80;
+  box-shadow: 4px 4px 0 #4ade80;
+}
+.gb-chamfer-btn-ghost:hover:not(:disabled) {
+  background: rgba(74,222,128,0.14);
+  color: #6ee7a0 !important;
+  box-shadow: 6px 6px 0 #4ade80;
+}
+.gb-chamfer-btn-ghost:active:not(:disabled) {
+  box-shadow: 0px 0px 0 #4ade80 !important;
+}
+
+/* ── Light Mode Button Overrides for High Contrast ── */
+[data-theme="light"] .gb-chamfer-btn-primary {
+  background: #16a34a;
+  color: #ffffff !important;
+  border: 2.5px solid #14532d;
+  box-shadow: 4px 4px 0 #14532d;
+}
+[data-theme="light"] .gb-chamfer-btn-primary:hover:not(:disabled) {
+  background: #15803d;
+  box-shadow: 6px 6px 0 #14532d;
+}
+[data-theme="light"] .gb-chamfer-btn-orange {
+  background: #ea580c;
+  color: #ffffff !important;
+  border: 2.5px solid #7c2d12;
+  box-shadow: 4px 4px 0 #7c2d12;
+}
+[data-theme="light"] .gb-chamfer-btn-orange:hover:not(:disabled) {
+  background: #c2410c;
+  box-shadow: 6px 6px 0 #7c2d12;
+}
+[data-theme="light"] .gb-chamfer-btn-ghost {
+  background: rgba(22, 163, 74, 0.08);
+  color: #15803d !important;
+  border: 2px solid #16a34a;
+  box-shadow: 3px 3px 0 #15803d;
+}
+[data-theme="light"] .gb-chamfer-btn-ghost:hover:not(:disabled) {
+  background: rgba(22, 163, 74, 0.16);
+  color: #166534 !important;
+  box-shadow: 5px 5px 0 #15803d;
+}
+
+/* ── DANGER: Rose/red fill ──
+   Shadow = dark crimson → visible against dark bg AND rose fill */
+.gb-chamfer-btn-danger {
+  background: #fb7185;
+  color: #0f172a !important;
+  border: 2.5px solid #9f1239;
+  box-shadow: 4px 4px 0 #9f1239;
+}
+.gb-chamfer-btn-danger:hover:not(:disabled) {
+  background: #fda4af;
+  box-shadow: 6px 6px 0 #9f1239;
+}
+.gb-chamfer-btn-danger:active:not(:disabled) {
+  box-shadow: 0px 0px 0 #9f1239 !important;
+}
+
+/* ── DISABLED ── */
+.gb-chamfer-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+  filter: grayscale(0.4);
+}
+
+/* ============================================================
+   Light Mode: Global Surface & Text Overrides
+   ============================================================ */
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Input fields in light mode */
+[data-theme="light"] input[type="text"],
+[data-theme="light"] input[type="email"],
+[data-theme="light"] input[type="number"],
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background-color: #ffffff;
+  color: #0f172a;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* ============================================================
+   Glass Panel & Surfaces
+   ============================================================ */
+.gb-glass-card {
+  background: var(--gb-surface);
+  border: 1px solid var(--gb-border);
+  border-radius: var(--gb-radius-md);
+  box-shadow: var(--gb-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.gb-glass-card-raised {
+  background: var(--gb-surface-raised);
+  border: 1px solid var(--gb-border-strong);
+  border-radius: var(--gb-radius-lg);
+  box-shadow: var(--gb-shadow);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Pulsing Mint Glow */
+.gb-glow-mint {
+  box-shadow: 0 0 25px -4px rgba(74, 222, 128, 0.35);
+}
+
+.gb-glow-orange {
+  box-shadow: 0 0 25px -4px rgba(249, 115, 22, 0.35);
+}
+
+/* ============================================================
+   Active Case Grid & Stability Layout
+   ============================================================ */
+.active-case-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .active-case-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.active-case-main,
+.active-case-rail,
+.clinical-card,
+.card-body {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* ============================================================
+   Cyber Wing Toggle Button Architecture (Exact Reference Design)
+   Parallelogram Body + Top-Left Wing + Bottom-Right Wing + Inner Lines
+   Recreates media_1794381831226_70811103.png
+   ============================================================ */
+.cyber-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), filter 0.18s ease;
+  margin: 4px 6px;
+}
+
+.cyber-toggle:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+}
+
+.cyber-toggle:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.cyber-toggle:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Wing Base Layers (Background) */
+.cyber-toggle-wing-tl {
+  position: absolute;
+  top: -4px;
+  left: -7px;
+  width: 52%;
+  height: 18px;
+  background: var(--cyber-accent, #4ade80);
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 7px) 100%, 0 100%);
+  z-index: 1;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+  opacity: 0.38;
+}
+
+.cyber-toggle-wing-br {
+  position: absolute;
+  bottom: -4px;
+  right: -7px;
+  width: 52%;
+  height: 18px;
+  background: var(--cyber-accent, #4ade80);
+  clip-path: polygon(7px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  z-index: 1;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+  opacity: 0.38;
+}
+
+/* Main Parallelogram Body */
+.cyber-toggle-body {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background: rgba(32, 25, 79, 0.92);
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(167, 139, 250, 0.28);
+}
+
+/* Internal Accent Stripes */
+.cyber-toggle-line-tr {
+  position: absolute;
+  top: 3px;
+  right: 12px;
+  width: 44%;
+  height: 2px;
+  background: var(--cyber-accent, #4ade80);
+  z-index: 3;
+  transition: opacity 0.2s ease, height 0.2s ease;
+  opacity: 0.45;
+}
+
+.cyber-toggle-line-bl {
+  position: absolute;
+  bottom: 3px;
+  left: 12px;
+  width: 44%;
+  height: 2px;
+  background: var(--cyber-accent, #4ade80);
+  z-index: 3;
+  transition: opacity 0.2s ease, height 0.2s ease;
+  opacity: 0.45;
+}
+
+/* Content Text / Icon */
+.cyber-toggle-content {
+  position: relative;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--gb-muted, #cbd5e1);
+  white-space: nowrap;
+}
+
+/* Size Variants */
+.cyber-toggle-sm .cyber-toggle-body {
+  padding: 5px 14px;
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+}
+.cyber-toggle-sm .cyber-toggle-wing-tl {
+  top: -3px;
+  left: -5px;
+  height: 14px;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+}
+.cyber-toggle-sm .cyber-toggle-wing-br {
+  bottom: -3px;
+  right: -5px;
+  height: 14px;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+.cyber-toggle-sm .cyber-toggle-content {
+  font-size: 11px;
+  gap: 5px;
+}
+
+.cyber-toggle-lg .cyber-toggle-body {
+  padding: 11px 26px;
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+}
+.cyber-toggle-lg .cyber-toggle-wing-tl {
+  top: -5px;
+  left: -9px;
+  height: 22px;
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+}
+.cyber-toggle-lg .cyber-toggle-wing-br {
+  bottom: -5px;
+  right: -9px;
+  height: 22px;
+  clip-path: polygon(9px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+.cyber-toggle-lg .cyber-toggle-content {
+  font-size: 14px;
+  gap: 9px;
+}
+
+/* ACTIVE / SELECTED STATE (Matches Reference Screenshot) */
+.cyber-toggle.active .cyber-toggle-wing-tl,
+.cyber-toggle[aria-checked="true"] .cyber-toggle-wing-tl,
+.cyber-toggle[data-active="true"] .cyber-toggle-wing-tl {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px var(--cyber-accent, #4ade80));
+}
+
+.cyber-toggle.active .cyber-toggle-wing-br,
+.cyber-toggle[aria-checked="true"] .cyber-toggle-wing-br,
+.cyber-toggle[data-active="true"] .cyber-toggle-wing-br {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px var(--cyber-accent, #4ade80));
+}
+
+.cyber-toggle.active .cyber-toggle-line-tr,
+.cyber-toggle[aria-checked="true"] .cyber-toggle-line-tr,
+.cyber-toggle[data-active="true"] .cyber-toggle-line-tr {
+  opacity: 1;
+  height: 2.5px;
+}
+
+.cyber-toggle.active .cyber-toggle-line-bl,
+.cyber-toggle[aria-checked="true"] .cyber-toggle-line-bl,
+.cyber-toggle[data-active="true"] .cyber-toggle-line-bl {
+  opacity: 1;
+  height: 2.5px;
+}
+
+.cyber-toggle.active .cyber-toggle-body,
+.cyber-toggle[aria-checked="true"] .cyber-toggle-body,
+.cyber-toggle[data-active="true"] .cyber-toggle-body {
+  background: #f1f5f9 !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+}
+
+.cyber-toggle.active .cyber-toggle-content,
+.cyber-toggle[aria-checked="true"] .cyber-toggle-content,
+.cyber-toggle[data-active="true"] .cyber-toggle-content {
+  color: #0f172a !important;
+  font-weight: 800;
+}
+
+/* Color Accent Variants (Exact Reference Palette) */
+.cyber-toggle-red,
+.cyber-toggle[data-variant="red"] {
+  --cyber-accent: #ef4444;
+}
+
+.cyber-toggle-cyan,
+.cyber-toggle-blue,
+.cyber-toggle[data-variant="cyan"],
+.cyber-toggle[data-variant="blue"] {
+  --cyber-accent: #38bdf8;
+}
+
+.cyber-toggle-orange,
+.cyber-toggle[data-variant="orange"] {
+  --cyber-accent: #f97316;
+}
+
+.cyber-toggle-mint,
+.cyber-toggle[data-variant="mint"] {
+  --cyber-accent: #4ade80;
+}
+
+.cyber-toggle-violet,
+.cyber-toggle[data-variant="violet"] {
+  --cyber-accent: #a78bfa;
+}
+
+/* Hover effect on inactive */
+.cyber-toggle:not(.active):hover .cyber-toggle-wing-tl,
+.cyber-toggle:not(.active):hover .cyber-toggle-wing-br {
+  opacity: 0.75;
+}
+
+.cyber-toggle:not(.active):hover .cyber-toggle-body {
+  background: rgba(46, 36, 110, 0.95);
+}
+
+.cyber-toggle:not(.active):hover .cyber-toggle-content {
+  color: #ffffff;
+}
+
+/* Accessible reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

@@ -14,3 +14,5 @@ frontend/node_modules/
 dist/
 build/
 
+cloudflared.exe
+frontend/dist/

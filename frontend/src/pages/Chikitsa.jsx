@@ -1,38 +1,74 @@
 import React, { useState, useEffect } from 'react';
-import { Pill, Printer, BookOpen, ShieldCheck, CheckCircle, AlertTriangle } from 'lucide-react';
-import ShlokaCard from '../components/ShlokaCard';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Pill, 
+  Printer, 
+  BookOpen, 
+  ShieldCheck, 
+  CheckCircle, 
+  AlertTriangle,
+  ArrowRight,
+  Flame,
+  Clock,
+  Layers
+} from 'lucide-react';
+import SourceCitationPanel from '../components/SourceCitationPanel';
 import AyurGuardSeal from '../components/AyurGuardSeal';
+import ChamferButton from '../components/ChamferButton';
+import CyberToggle from '../components/CyberToggle';
+import { StatusBadge, EmptyState } from '../components/ClinicalPrimitives';
 import { api } from '../services/api';
 
 export default function Chikitsa({ activePatientId, patients = [] }) {
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showCitations, setShowCitations] = useState(false);
 
   const activePatient = patients.find(p => p.id === activePatientId) || patients[0];
 
   useEffect(() => {
     async function loadRx() {
+      if (!activePatient) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
-        const complaints = [
-          activePatient?.full_name?.includes('Sharma')
-            ? 'Grahani bloating indigestion loose stools'
-            : activePatient?.full_name?.includes('Deshmukh')
-            ? 'Prameha frequent urination diabetes thirst'
-            : 'Amavata joint swelling stiffness severe morning pain'
-        ];
+        let loaded = null;
 
-        const res = await api.analyzeConsultation({
-          patient_name: activePatient?.full_name || 'Patient',
-          age: activePatient?.age || 40,
-          gender: activePatient?.gender || 'Female',
-          prakriti: activePatient?.prakriti || 'Vata-Kapha',
-          agni: activePatient?.agni || 'Mandagni',
-          koshtha: activePatient?.koshtha || 'Madhyama',
-          chief_complaints: complaints
-        });
+        // 1. Try active case session first
+        try {
+          const caseRes = await api.getPatientCase(activePatient.id);
+          if (caseRes?.active_analysis?.analysis) {
+            loaded = caseRes.active_analysis.analysis;
+          }
+        } catch (e) {
+          // No case yet
+        }
 
-        setData(res);
+        // 2. Try latest consultation
+        if (!loaded) {
+          try {
+            const consult = await api.getLatestPatientConsultation(activePatient.id);
+            if (consult) {
+              loaded = {
+                probable_vyadhi: consult.probable_vyadhi,
+                chikitsa_sutra: consult.chikitsa_sutra,
+                prescriptions: consult.prescriptions,
+                pathya: consult.pathya,
+                apathya: consult.apathya,
+                citations: consult.citations,
+                safety_audit: consult.safety_audit
+              };
+            }
+          } catch (e) {
+            // No consultation
+          }
+        }
+
+        setData(loaded);
       } catch (err) {
         console.error('Failed to load Chikitsa:', err);
       } finally {
@@ -41,85 +77,135 @@ export default function Chikitsa({ activePatientId, patients = [] }) {
     }
 
     loadRx();
-  }, [activePatientId, activePatient]);
+  }, [activePatientId, activePatient?.id]);
 
   if (loading) {
     return (
       <div className="py-20 text-center space-y-3">
-        <div className="animate-spin w-8 h-8 border-4 border-emerald-700 border-t-transparent rounded-full mx-auto"></div>
-        <p className="text-xs text-stone-500 font-semibold">Formulating Personalized Ayurvedic Therapeutics...</p>
+        <div className="animate-spin w-8 h-8 border-4 border-emerald-400 border-t-transparent rounded-full mx-auto" />
+        <p className="text-xs text-violet-300 font-semibold">Formulating Personalized Ayurvedic Therapeutics...</p>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="py-12 max-w-xl mx-auto space-y-6">
+        <EmptyState
+          title={`No Treatment Plan for ${activePatient?.full_name || 'Patient'}`}
+          description="A clinical case analysis must be generated to formulate personalized therapeutics, approved vehicles (Anupana), and dosage timing."
+          actionLabel="Open Active Case Workspace"
+          onAction={() => navigate(`/case/${activePatient?.id || 1}`)}
+        />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 py-4">
+    <div className="space-y-6 py-4 w-full max-w-[1240px] mx-auto min-w-0">
       {/* Header */}
-      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-[#20194f] border border-violet-400/30 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-            Personalized Therapeutics
+          <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400">
+            Personalized Ayurvedic Therapeutics
           </span>
-          <h1 className="text-xl font-bold text-stone-900 dark:text-stone-100 mt-1">
-            Chikitsa Sutra &amp; Formulation Prescription Planner
+          <h1 className="text-xl font-black text-white mt-1">
+            Chikitsa Sutra &amp; Formulation Planner
           </h1>
-          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-            Patient: <strong className="text-stone-800 dark:text-stone-200">{activePatient?.full_name}</strong> &bull; Indication: {data?.probable_vyadhi}
+          <p className="text-xs text-violet-200/80 mt-0.5">
+            Patient: <strong className="text-white">{activePatient?.full_name}</strong> &bull; Indication: {data.probable_vyadhi}
           </p>
         </div>
 
-        <button
-          onClick={() => window.print()}
-          className="bg-emerald-800 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs flex items-center space-x-2 shadow transition"
-        >
-          <Printer className="w-4 h-4" />
-          <span>Print Vaidya Rx Sheet</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <ChamferButton
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(`/case/${activePatient?.id || 1}`)}
+          >
+            Case Workspace &rarr;
+          </ChamferButton>
+          <ChamferButton
+            variant="primary"
+            size="sm"
+            icon={Printer}
+            onClick={() => window.print()}
+          >
+            Print Vaidya Rx
+          </ChamferButton>
+        </div>
       </div>
 
       {/* Chikitsa Sutra Card */}
-      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm space-y-2">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
+      <div className="bg-[#20194f] border border-amber-400/40 rounded-2xl p-6 shadow-xl space-y-2">
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-300 block">
           Governing Classical Chikitsa Sutra
         </span>
-        <p className="text-sm font-semibold text-emerald-950 dark:text-emerald-200 bg-emerald-50 dark:bg-emerald-950/40 p-4 rounded-xl border border-emerald-200 dark:border-emerald-800 leading-relaxed">
-          {data?.chikitsa_sutra}
+        <p className="text-sm font-semibold font-serif text-amber-200 bg-[#171342] p-4 rounded-xl border border-amber-400/30 leading-relaxed">
+          {data.chikitsa_sutra}
         </p>
       </div>
 
-      {/* Formulations Prescription Table */}
-      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm space-y-4">
-        <h3 className="font-bold text-sm uppercase tracking-wider text-stone-800 dark:text-stone-200 flex items-center gap-2">
-          <Pill className="w-4 h-4 text-emerald-600" />
-          <span>Prescribed Classical Formulations (With Verified Anupana)</span>
-        </h3>
+      {/* Formulations Prescription Cards */}
+      <div className="bg-[#20194f] border border-violet-400/30 rounded-2xl p-6 shadow-xl space-y-4">
+        <div className="flex items-center justify-between border-b border-violet-400/20 pb-3">
+          <h3 className="font-extrabold text-sm uppercase tracking-wider text-white flex items-center gap-2">
+            <Pill className="w-4 h-4 text-emerald-400" />
+            <span>Certified Classical Prescriptions</span>
+          </h3>
+          <CyberToggle
+            active={showCitations}
+            onClick={() => setShowCitations(!showCitations)}
+            variant="violet"
+            size="sm"
+            icon={BookOpen}
+          >
+            {showCitations ? 'Hide Citations' : 'View Textual Citations'}
+          </CyberToggle>
+        </div>
 
-        <div className="space-y-3">
-          {data?.prescriptions.map((p, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {data.prescriptions?.map((p, idx) => (
             <div
               key={idx}
-              className="p-4 bg-stone-50 dark:bg-stone-800/40 rounded-xl border border-stone-200 dark:border-stone-700 space-y-2 text-xs"
+              className="p-5 bg-[#171342] rounded-2xl border border-violet-400/25 space-y-3 text-xs shadow-md"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-200 dark:border-stone-700 pb-2">
+              <div className="flex items-start justify-between gap-2 border-b border-violet-400/20 pb-2.5">
                 <div>
-                  <h4 className="font-bold text-sm text-stone-900 dark:text-stone-100">{p.name}</h4>
-                  <span className="text-[11px] text-stone-500">Ref: {p.shloka_ref}</span>
+                  <h4 className="font-black text-sm text-white">{p.name}</h4>
+                  <span className="text-[11px] text-violet-400 font-mono">Ref: {p.shloka_ref}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200 border border-amber-300 dark:border-amber-700 font-bold rounded-lg text-[11px]">
-                    Anupana: {p.anupana}
-                  </span>
-                  <span className="px-2 py-1 bg-emerald-100 text-emerald-800 font-semibold rounded-lg text-[11px]">
-                    {p.is_safe ? 'Safe' : 'Warning'}
-                  </span>
-                </div>
+                <StatusBadge 
+                  status={p.is_safe ? 'verified' : 'safety_hold'}
+                  label={p.is_safe ? 'Safe' : 'Contraindicated'}
+                />
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pt-1 text-stone-600 dark:text-stone-300">
-                <div><strong>Dosage:</strong> {p.dosage}</div>
-                <div><strong>Kala (Timing):</strong> {p.kala}</div>
-                <div><strong>Key Herbs:</strong> {p.ingredients?.join(', ') || 'Classical compound'}</div>
+              <div className="space-y-1.5 text-slate-200">
+                <p><span className="font-bold text-violet-300">Dosage: </span>{p.dosage}</p>
+                <p><span className="font-bold text-violet-300">Kala (Timing): </span>{p.kala}</p>
+                <p>
+                  <span className="font-bold text-violet-300">Approved Anupana: </span>
+                  <span className="inline-block px-2.5 py-0.5 rounded-lg bg-amber-950/70 text-amber-300 border border-amber-400/40 font-bold text-[11px]">
+                    {p.anupana}
+                  </span>
+                </p>
+                {p.ingredients && p.ingredients.length > 0 && (
+                  <p className="text-[11px] text-violet-300/80 pt-1">
+                    <span className="font-bold text-white">Ingredients: </span>
+                    {p.ingredients.join(', ')}
+                  </p>
+                )}
               </div>
+
+              {p.contraindications && p.contraindications.length > 0 && (
+                <div className="p-2.5 rounded-xl bg-rose-950/50 border border-rose-500/40 text-[11px] text-rose-300 space-y-0.5">
+                  <span className="font-black block">Contraindications:</span>
+                  {p.contraindications.map((c, i) => (
+                    <p key={i}>&bull; {c}</p>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -127,23 +213,23 @@ export default function Chikitsa({ activePatientId, patients = [] }) {
 
       {/* Pathya & Apathya */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-emerald-50/70 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-2xl p-6 text-xs space-y-3">
-          <h4 className="font-bold text-sm text-emerald-900 dark:text-emerald-300 uppercase tracking-wider">
+        <div className="bg-[#20194f] border border-emerald-400/30 rounded-2xl p-6 text-xs space-y-3 shadow-xl">
+          <h4 className="font-black text-sm text-emerald-400 uppercase tracking-wider">
             Pathya (Wholesome Diet &amp; Regimen)
           </h4>
-          <ul className="list-disc list-inside space-y-1.5 text-stone-700 dark:text-stone-300">
-            {data?.pathya.map((p, i) => (
+          <ul className="list-disc list-inside space-y-1.5 text-slate-200">
+            {data.pathya?.map((p, i) => (
               <li key={i}>{p}</li>
             ))}
           </ul>
         </div>
 
-        <div className="bg-rose-50/70 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 rounded-2xl p-6 text-xs space-y-3">
-          <h4 className="font-bold text-sm text-rose-900 dark:text-rose-300 uppercase tracking-wider">
+        <div className="bg-[#20194f] border border-rose-500/30 rounded-2xl p-6 text-xs space-y-3 shadow-xl">
+          <h4 className="font-black text-sm text-rose-400 uppercase tracking-wider">
             Apathya (Strict Restrictions &amp; Incompatibilities)
           </h4>
-          <ul className="list-disc list-inside space-y-1.5 text-stone-700 dark:text-stone-300">
-            {data?.apathya.map((a, i) => (
+          <ul className="list-disc list-inside space-y-1.5 text-rose-300">
+            {data.apathya?.map((a, i) => (
               <li key={i}>{a}</li>
             ))}
           </ul>
@@ -151,22 +237,16 @@ export default function Chikitsa({ activePatientId, patients = [] }) {
       </div>
 
       {/* AyurGuard Safety Audit */}
-      <AyurGuardSeal audit={data?.safety_audit} />
+      <AyurGuardSeal audit={data.safety_audit} />
 
-      {/* Backing Classical Shlokas */}
-      <div className="space-y-4">
-        <h3 className="font-bold text-sm uppercase tracking-wider text-stone-800 dark:text-stone-200 flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-amber-500" />
-          <span>Authenticated Grounding Verses (Brihat Trayi)</span>
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {data?.citations.map((c, i) => (
-            <ShlokaCard key={i} citation={c} />
-          ))}
-        </div>
-      </div>
-
+      {/* Dedicated Source Citation Panel */}
+      {(showCitations || data.citations?.length > 0) && (
+        <SourceCitationPanel
+          citations={data.citations || []}
+          title="Brihat Trayi Grounding Evidence for this Treatment Plan"
+          subtitle="Verifiable classical verses supporting the prescribed formulations and Bheshaja Kala"
+        />
+      )}
     </div>
   );
 }
-

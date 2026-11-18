@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle, Info, Filter } from 'lucide-react';
+import ChamferButton from '../components/ChamferButton';
+import CyberToggle from '../components/CyberToggle';
 import { api } from '../services/api';
 
 export default function SafetyAudit() {
@@ -9,6 +11,7 @@ export default function SafetyAudit() {
   const [isPregnant, setIsPregnant] = useState(true);
   const [testResult, setTestResult] = useState(null);
   const [viruddhaRules, setViruddhaRules] = useState([]);
+  const [ruleCategory, setRuleCategory] = useState('all');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -35,16 +38,16 @@ export default function SafetyAudit() {
   };
 
   return (
-    <div className="space-y-6 py-4">
+    <div className="space-y-6 py-4 w-full max-w-[1240px] mx-auto min-w-0">
       {/* Header */}
-      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm space-y-1">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400">
+      <div className="bg-[#20194f] border border-orange-500/40 rounded-2xl p-6 shadow-xl space-y-2">
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-orange-400">
           Zero-Tolerance Clinical Firewall
         </span>
-        <h1 className="text-xl font-bold text-stone-900 dark:text-stone-100">
+        <h1 className="text-xl font-black text-white">
           AyurGuard Deterministic Clinical Safety &amp; Anupana Validator
         </h1>
-        <p className="text-xs text-stone-500 dark:text-stone-400">
+        <p className="text-xs text-violet-200/80">
           Enforces non-probabilistic rule checking for Anupana compatibility, Garbhini restrictions, and Viruddha Ahara food toxicity.
         </p>
       </div>
@@ -52,18 +55,18 @@ export default function SafetyAudit() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
         {/* Live Safety Tester (5 cols) */}
-        <div className="lg:col-span-5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm space-y-4">
-          <h3 className="font-bold text-sm uppercase tracking-wider text-stone-800 dark:text-stone-200 border-b border-stone-100 dark:border-stone-800 pb-3">
+        <div className="lg:col-span-5 bg-[#20194f] border border-violet-400/30 rounded-2xl p-6 shadow-xl space-y-4">
+          <h3 className="font-extrabold text-sm uppercase tracking-wider text-white border-b border-violet-400/20 pb-3">
             Interactive Safety Simulator
           </h3>
 
-          <form onSubmit={runAudit} className="space-y-3.5 text-xs">
+          <form onSubmit={runAudit} className="space-y-4 text-xs">
             <div>
-              <label className="block font-semibold text-stone-700 dark:text-stone-300 mb-1">Formulation:</label>
+              <label className="block font-bold text-violet-200 mb-1">Formulation:</label>
               <select
                 value={formulation}
                 onChange={(e) => setFormulation(e.target.value)}
-                className="w-full border border-stone-300 dark:border-stone-700 dark:bg-stone-800 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                className="w-full bg-[#171342] border border-violet-400/40 rounded-xl p-3 text-white focus:ring-2 focus:ring-emerald-400 focus:outline-none"
               >
                 <option value="Simhanada Guggulu">Simhanada Guggulu (Contains Castor Oil &amp; Guggulu)</option>
                 <option value="Chitrakadi Vati">Chitrakadi Vati (Contains Chitraka &amp; Alkalis)</option>
@@ -71,78 +74,81 @@ export default function SafetyAudit() {
                 <option value="Punarnava Mandur">Punarnava Mandur (Contains Iron Bhasma)</option>
                 <option value="Yogaraj Guggulu">Yogaraj Guggulu (Contains Guggulu &amp; Chitraka)</option>
                 <option value="Sudarshana Churna">Sudarshana Churna (Bitter antipyretic churna)</option>
+                <option value="Avipattikar Churna">Avipattikar Churna (Contains Trivrit &amp; Lavana)</option>
               </select>
             </div>
 
             <div>
-              <label className="block font-semibold text-stone-700 dark:text-stone-300 mb-1">Prescribed Anupana (Vehicle):</label>
+              <label className="block font-bold text-violet-200 mb-1">Prescribed Anupana (Vehicle):</label>
               <input
                 type="text"
                 value={anupana}
                 onChange={(e) => setAnupana(e.target.value)}
                 placeholder="e.g. Warm water, Cold water, Milk, Curd"
-                className="w-full border border-stone-300 dark:border-stone-700 dark:bg-stone-800 rounded-xl p-2.5 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                className="w-full bg-[#171342] border border-violet-400/40 rounded-xl p-3 text-white focus:ring-2 focus:ring-emerald-400 focus:outline-none"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block font-semibold text-stone-700 dark:text-stone-300 mb-1">Patient Age:</label>
+                <label className="block font-bold text-violet-200 mb-1">Patient Age:</label>
                 <input
                   type="number"
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="w-full border border-stone-300 dark:border-stone-700 dark:bg-stone-800 rounded-xl p-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full bg-[#171342] border border-violet-400/40 rounded-xl p-3 text-white focus:ring-2 focus:ring-emerald-400 focus:outline-none"
                 />
               </div>
               <div className="flex items-center pt-5">
-                <label className="flex items-center space-x-2 text-stone-700 dark:text-stone-300 cursor-pointer">
+                <label className="flex items-center space-x-2 text-white cursor-pointer">
                   <input
                     type="checkbox"
                     checked={isPregnant}
                     onChange={(e) => setIsPregnant(e.target.checked)}
-                    className="rounded text-rose-600 focus:ring-rose-500"
+                    className="w-4 h-4 rounded text-rose-500 bg-[#171342] border-rose-400"
                   />
-                  <span className="font-semibold text-xs">Pregnant (Garbhini)</span>
+                  <span className="font-bold text-xs">Pregnant (Garbhini)</span>
                 </label>
               </div>
             </div>
 
-            <button
+            <ChamferButton
+              variant="orange"
+              size="md"
               type="submit"
               disabled={loading}
-              className="w-full bg-emerald-800 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition"
+              className="w-full justify-center"
             >
               {loading ? 'Evaluating...' : 'Run AyurGuard Audit'}
-            </button>
+            </ChamferButton>
           </form>
 
           {/* Test Audit Result Box */}
           {testResult && (
-            <div className={`p-4 rounded-xl border text-xs space-y-2 ${
+            <div className={`p-4 rounded-xl border text-xs space-y-2.5 ${
               testResult.is_safe
-                ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-300 text-emerald-950 dark:text-emerald-200'
-                : 'bg-rose-50 dark:bg-rose-950/40 border-rose-300 text-rose-950 dark:text-rose-200'
+                ? 'bg-emerald-950/40 border-emerald-400 text-emerald-200'
+                : 'bg-rose-950/50 border-rose-500 text-rose-200'
             }`}>
-              <div className="flex items-center gap-2 font-bold text-sm">
+              <div className="flex items-center gap-2 font-black text-sm">
                 {testResult.is_safe ? (
                   <>
-                    <CheckCircle className="w-5 h-5 text-emerald-600" />
+                    <CheckCircle className="w-5 h-5 text-emerald-400" />
                     <span>APPROVED SAFE</span>
                   </>
                 ) : (
                   <>
-                    <AlertTriangle className="w-5 h-5 text-rose-600" />
+                    <AlertTriangle className="w-5 h-5 text-rose-400" />
                     <span>REJECTED / CONTRAINDICATED</span>
                   </>
                 )}
               </div>
 
               {testResult.contraindications.length > 0 && (
-                <div className="space-y-1 font-semibold pt-1">
+                <div className="space-y-1 font-bold pt-1">
                   {testResult.contraindications.map((c, i) => (
-                    <div key={i} className="flex items-start gap-1.5">
-                      <span>🚫</span>
+                    <div key={i} className="flex items-start gap-1.5 text-rose-300">
+                      <span>&bull;</span>
                       <span>{c}</span>
                     </div>
                   ))}
@@ -150,8 +156,8 @@ export default function SafetyAudit() {
               )}
 
               {testResult.warnings.length > 0 && (
-                <div className="pt-2 border-t border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300">
-                  <span className="font-bold">Advisories:</span>
+                <div className="pt-2 border-t border-violet-400/20 text-slate-200 space-y-1">
+                  <span className="font-extrabold text-amber-300">Advisories:</span>
                   {testResult.warnings.map((w, i) => (
                     <div key={i}>&bull; {w}</div>
                   ))}
@@ -162,31 +168,54 @@ export default function SafetyAudit() {
         </div>
 
         {/* Viruddha Ahara Reference Table (7 cols) */}
-        <div className="lg:col-span-7 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm space-y-4">
-          <div className="border-b border-stone-100 dark:border-stone-800 pb-3">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-stone-800 dark:text-stone-200">
-              Canonical Incompatible Combinations (Viruddha Ahara)
-            </h3>
-            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-              Strictly filtered to prevent dietary toxicity, channel obstruction, and allergic reactions.
-            </p>
+        <div className="lg:col-span-7 bg-[#20194f] border border-violet-400/30 rounded-2xl p-6 shadow-xl space-y-4">
+          <div className="border-b border-violet-400/20 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="font-extrabold text-sm uppercase tracking-wider text-white">
+                Canonical Incompatible Combinations (Viruddha Ahara)
+              </h3>
+              <p className="text-xs text-violet-200/80 mt-0.5">
+                Strictly filtered to prevent dietary toxicity, channel obstruction, and allergic reactions.
+              </p>
+            </div>
+          </div>
+
+          {/* CyberToggle Filter Row */}
+          <div className="flex items-center flex-wrap gap-1 p-1 bg-[#171342] border border-violet-400/30 rounded-2xl">
+            {[
+              { id: 'all', label: 'All Rules', variant: 'mint' },
+              { id: 'viruddha', label: 'Dietary (Viruddha)', variant: 'orange' },
+              { id: 'garbhini', label: 'Maternal (Garbhini)', variant: 'red' },
+              { id: 'dhatu', label: 'Dhatu Kshaya', variant: 'cyan' },
+              { id: 'kala', label: 'Seasonal (Kala)', variant: 'violet' }
+            ].map((cat) => (
+              <CyberToggle
+                key={cat.id}
+                active={ruleCategory === cat.id}
+                onClick={() => setRuleCategory(cat.id)}
+                variant={cat.variant}
+                size="sm"
+              >
+                {cat.label}
+              </CyberToggle>
+            ))}
           </div>
 
           <div className="space-y-3">
             {viruddhaRules.map((r, i) => (
               <div
                 key={i}
-                className="p-3.5 bg-stone-50 dark:bg-stone-800/40 rounded-xl border border-stone-200 dark:border-stone-700 text-xs space-y-1"
+                className="p-4 bg-[#171342] rounded-xl border border-violet-400/25 text-xs space-y-1.5 shadow-md"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-rose-900 dark:text-rose-400 text-sm">
+                  <span className="font-black text-rose-400 text-sm">
                     {r.pair.join(' + ')}
                   </span>
-                  <span className="text-[10px] font-mono bg-stone-200 dark:bg-stone-700 px-2 py-0.5 rounded text-stone-700 dark:text-stone-300">
+                  <span className="text-[10px] font-mono bg-violet-950 text-violet-300 px-2.5 py-0.5 rounded border border-violet-400/30">
                     {r.reference}
                   </span>
                 </div>
-                <p className="text-stone-600 dark:text-stone-300 leading-relaxed">
+                <p className="text-slate-200 leading-relaxed">
                   {r.reason}
                 </p>
               </div>
@@ -198,4 +227,3 @@ export default function SafetyAudit() {
     </div>
   );
 }
-

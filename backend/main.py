@@ -6,7 +6,7 @@ National Open Ayurveda AI Challenge | Techfest, IIT Bombay & Ministry of Ayush
 import os
 os.environ["DISABLE_SQLALCHEMY_CEXT"] = "1"
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
@@ -19,6 +19,7 @@ from backend.database.seed_data import seed_database
 from backend.routes import (
     patients,
     consultation,
+    cases,
     knowledge_graph,
     rag,
     safety,
@@ -57,6 +58,7 @@ app.add_middleware(
 
 # Mount API Routers
 app.include_router(patients.router, prefix=settings.API_PREFIX)
+app.include_router(cases.router, prefix=settings.API_PREFIX)
 app.include_router(consultation.router, prefix=settings.API_PREFIX)
 app.include_router(knowledge_graph.router, prefix=settings.API_PREFIX)
 app.include_router(rag.router, prefix=settings.API_PREFIX)
@@ -83,9 +85,11 @@ if os.path.exists(frontend_dist_path):
 
     @app.get("/{full_path:path}", response_class=HTMLResponse)
     async def serve_spa(full_path: str):
+        if full_path.startswith("api/") or full_path == "api":
+            raise HTTPException(status_code=404, detail="API route not found")
         index_file = os.path.join(frontend_dist_path, "index.html")
         if os.path.exists(index_file):
-            return FileResponse(index_file)
+            return FileResponse(index_file, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
         return HTMLResponse("<h1>AyuVaidya Frontend Building...</h1>")
 else:
     # Serve embedded static dashboard if dist not yet compiled

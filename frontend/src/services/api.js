@@ -9,6 +9,7 @@ async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
   const headers = {
     'Content-Type': 'application/json',
+    'Bypass-Tunnel-Reminder': 'true',
     ...(options.headers || {})
   };
 
@@ -43,6 +44,37 @@ export const api = {
     body: JSON.stringify(data)
   }),
   getConsultation: (id) => request(`/consultations/${id}`),
+  getLatestPatientConsultation: (patientId) => request(`/consultations/patient/${patientId}/latest`),
+
+  // Persistent Active Case Sessions
+  createCase: (data) => request('/cases/', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  getCase: (caseId) => request(`/cases/${caseId}`),
+  getPatientCase: (patientId) => request(`/cases/patient/${patientId}`),
+  addCaseFact: (caseId, data) => request(`/cases/${caseId}/facts`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  updateCaseFact: (caseId, factId, data) => request(`/cases/${caseId}/facts/${factId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  }),
+  deleteCaseFact: (caseId, factId) => request(`/cases/${caseId}/facts/${factId}`, {
+    method: 'DELETE'
+  }),
+  getNextQuestion: (caseId) => request(`/cases/${caseId}/next-question`, {
+    method: 'POST'
+  }),
+  addConversationTurn: (caseId, data) => request(`/cases/${caseId}/conversation`, {
+    method: 'POST',
+    body: JSON.stringify(data)
+  }),
+  analyzeCase: (caseId) => request(`/cases/${caseId}/analyze`, {
+    method: 'POST'
+  }),
+  getCaseAnalyses: (caseId) => request(`/cases/${caseId}/analyses`),
 
   // Knowledge Graph
   getGraphSubgraph: (center = null, depth = 1) => {

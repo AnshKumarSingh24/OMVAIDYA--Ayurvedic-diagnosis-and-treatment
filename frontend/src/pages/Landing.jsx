@@ -20,9 +20,16 @@ import {
   Flame,
   Award
 } from 'lucide-react';
+import TopNavigation from '../components/TopNavigation';
+import DecorativeMemphisBackground from '../components/DecorativeMemphisBackground';
+import MetricStrip from '../components/MetricStrip';
+import ChamferButton from '../components/ChamferButton';
+import SegmentedToggle from '../components/SegmentedToggle';
+import CyberToggle from '../components/CyberToggle';
+import { ClinicalCard, StatusBadge, EvidenceBadge } from '../components/ClinicalPrimitives';
 import ShlokaCard from '../components/ShlokaCard';
 
-export default function Landing({ onSelectPreset }) {
+export default function Landing({ onSelectPreset, isDark, onToggleTheme }) {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState(null);
   const [demoTab, setDemoTab] = useState('amavata');
@@ -94,17 +101,17 @@ export default function Landing({ onSelectPreset }) {
   const handleLaunchPreset = (type) => {
     localStorage.setItem('ayuvaidya_onboarded', 'true');
     if (onSelectPreset) onSelectPreset(type);
-    navigate('/');
+    navigate('/case');
   };
 
   const faqs = [
     {
-      q: 'What makes AyuVaidya different from asking ChatGPT or generic health AIs?',
-      a: 'Generic AIs frequently hallucinate fake Sanskrit shlokas, omit crucial adjuvant vehicles (Anupana), and prescribe drastic purification (Shodhana) or heavy mineral bhasmas without knowing if a patient is pregnant or frail. AyuVaidya uses IIT Bombay\'s specialized 2.9B AyurParam model, strictly constraints outputs to authentic Brihat Trayi verses, and passes every drug through the AyurGuard deterministic safety firewall.'
+      q: 'What makes AyuVaidya different from asking generic health AIs?',
+      a: 'Generic AIs hallucinate fake Sanskrit shlokas, omit crucial adjuvant vehicles (Anupana), and prescribe drastic purification (Shodhana) or heavy mineral bhasmas without knowing if a patient is pregnant or frail. AyuVaidya uses IIT Bombay\'s specialized 2.9B AyurParam model, strictly constraints outputs to authentic Brihat Trayi verses, and passes every recommendation through the AyurGuard deterministic safety gate.'
     },
     {
       q: 'Why is Anupana (Vehicle) verification so critical in Ayurvedic medicine?',
-      a: 'In Ayurveda, taking a medicine with the wrong vehicle can produce toxic or reverse effects. For instance, consuming Guggulu with chilled water causes drug obstruction (Guggulu Sanga); heating honey or taking honey with hot liquids alters chemical properties (Samskara Viruddha). AyurGuard deterministically verifies and blocks unsafe vehicles before rendering any advice.'
+      a: 'In Ayurveda, taking a medicine with the wrong vehicle can produce toxic or reversed effects. For instance, consuming Guggulu with chilled water causes drug obstruction (Guggulu Sanga); heating honey or taking honey with hot liquids alters chemical properties (Samskara Viruddha). AyurGuard deterministically verifies and blocks unsafe vehicles before rendering any advice.'
     },
     {
       q: 'What is AyurParam 2.9B?',
@@ -112,435 +119,453 @@ export default function Landing({ onSelectPreset }) {
     },
     {
       q: 'Who is AyuVaidya designed for?',
-      a: 'AyuVaidya is designed for NCISM-registered BAMS/MD Ayurvedic practitioners (Vaidyas), clinical researchers, medical students, and wellness seekers seeking source-traceable, trustworthy classical guidance.'
+      a: 'AyuVaidya is designed for NCISM-registered BAMS/MD Ayurvedic practitioners (Vaidyas), clinical researchers, medical students, and wellness seekers looking for source-traceable, trustworthy classical guidance.'
     }
   ];
 
+  const currentCase = demoCases[demoTab];
+
   return (
-    <div className="space-y-16 pb-16">
+    <div className="w-full space-y-16 pb-20">
+      
+      {/* Floating Top Navigation */}
+      <TopNavigation
+        isDark={isDark}
+        onToggleTheme={onToggleTheme}
+      />
 
-      {/* Floating Top Nav */}
-      <header className="sticky top-4 z-50 max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-white/90 dark:bg-stone-900/90 backdrop-blur-md border border-stone-200 dark:border-stone-800 rounded-2xl px-5 py-3 shadow-sm flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-800 to-emerald-600 flex items-center justify-center text-amber-300 font-bold text-lg shadow-sm">
-              ॐ
-            </div>
-            <div>
-              <span className="font-extrabold text-base text-stone-900 dark:text-stone-100 tracking-tight">AyuVaidya</span>
-              <span className="ml-2 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700">
-                AyurParam 2.9B
-              </span>
-            </div>
-          </div>
-
-          <div className="hidden md:flex items-center space-x-6 text-xs font-semibold text-stone-600 dark:text-stone-300">
-            <a href="#how-it-works" className="hover:text-emerald-700 transition">How It Works</a>
-            <a href="#demo-sandbox" className="hover:text-emerald-700 transition">Live Demo Sandbox</a>
-            <a href="#brihat-trayi" className="hover:text-emerald-700 transition">Brihat Trayi Corpus</a>
-            <a href="#safety-engine" className="hover:text-emerald-700 transition">AyurGuard Safety</a>
-            <a href="#faq" className="hover:text-emerald-700 transition">FAQ</a>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => handleLaunchPreset('amavata')}
-              className="hidden sm:inline-flex text-xs font-semibold px-3.5 py-2 rounded-xl text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition"
-            >
-              Quick Demo Case
-            </button>
-            <button
-              onClick={handleStartOnboarding}
-              className="bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-md transition flex items-center space-x-1.5"
-            >
-              <span>Start Free Assessment</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900 to-stone-900 text-white p-8 md:p-16 shadow-2xl border border-emerald-800/40 max-w-7xl mx-auto">
-        <div className="relative z-10 max-w-3xl space-y-6">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold backdrop-blur-sm">
+      {/* Hero Section with Memphis Background & Layered Waves */}
+      <DecorativeMemphisBackground className="pt-6 sm:pt-12 pb-16 sm:pb-24 px-4 sm:px-6">
+        <div className="max-w-[1240px] mx-auto text-center space-y-8">
+          
+          {/* Eyebrow Pill */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1e1754]/90 border border-violet-400/40 text-xs font-bold text-violet-200 shadow-lg backdrop-blur-md">
+            <span className="text-orange-400 font-mono tracking-widest">:::</span>
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>National Open Ayurveda AI Challenge &bull; Techfest, IIT Bombay 2026–27</span>
+            <span className="tracking-wide uppercase">BRIHAT TRAYI CLINICAL AI &times; AYURPARAM 2.9B</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-            AI-Powered <span className="text-amber-300 font-sanskrit">Ayurvedic</span> Diagnosis, Grounded in 5,000 Years of Wisdom.
-          </h1>
+          {/* Headline with Crisp White + Electric Mint Accent */}
+          <div className="space-y-3 max-w-4xl mx-auto">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.12]">
+              Ground your clinical reasoning.
+            </h1>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-emerald-400 tracking-tight leading-[1.12]">
+              Harmonize the Samprapti.
+            </h2>
+          </div>
 
-          <p className="text-stone-300 text-sm md:text-base leading-relaxed">
-            Generic healthcare AIs hallucinate fake remedies and dangerous herbal dosages.
-            <strong className="text-white"> AyuVaidya</strong> harnesses IIT Bombay’s open-source <strong className="text-white">AyurParam (2.9B)</strong> model
-            anchored directly to the authenticated <strong className="text-white">Brihat Trayi</strong> (Charaka, Sushruta, Vagbhata) with
-            deterministic clinical contraindication guardrails.
+          {/* Subtitle */}
+          <p className="max-w-2xl mx-auto text-slate-300 text-sm sm:text-base leading-relaxed">
+            IIT Bombay's AyurParam 2.9B LLM anchored to authentic Brihat Trayi verses, multi-factor Lakshana differentiation, and deterministic AyurGuard safety guardrails — united into one calm, source-grounded clinical workspace.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 pt-4">
-            <button
+          {/* Call to Action Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <ChamferButton
+              variant="primary"
+              size="lg"
+              withArrow
               onClick={handleStartOnboarding}
-              className="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 font-extrabold px-7 py-3.5 rounded-xl shadow-xl transition transform hover:-translate-y-0.5 flex items-center space-x-2 text-sm"
+              className="text-sm sm:text-base font-extrabold"
             >
-              <span>Begin Personalized Health Intake</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <a
-              href="#demo-sandbox"
-              className="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold px-5 py-3.5 rounded-xl transition text-sm flex items-center space-x-2"
+              Personalised Clinical Intake
+            </ChamferButton>
+
+            <ChamferButton
+              variant="orange"
+              size="lg"
+              onClick={() => {
+                localStorage.setItem('ayuvaidya_onboarded', 'true');
+                navigate('/case');
+              }}
+              className="text-sm sm:text-base font-extrabold"
             >
-              <Eye className="w-4 h-4" />
-              <span>Explore Interactive Demo Sandbox</span>
-            </a>
+              Explore Case Workspace
+            </ChamferButton>
+
+            <ChamferButton
+              variant="ghost"
+              size="lg"
+              onClick={() => {
+                const el = document.getElementById('how-it-works');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="text-sm sm:text-base font-extrabold"
+            >
+              &or; Know More
+            </ChamferButton>
           </div>
 
-          {/* Key Proof Pillars */}
-          <div className="grid grid-cols-3 gap-3 pt-6 border-t border-emerald-800/60 text-xs">
-            <div>
-              <div className="font-extrabold text-amber-300 text-base">100%</div>
-              <div className="text-stone-400 text-[11px] mt-0.5">Shloka Traceability</div>
-            </div>
-            <div>
-              <div className="font-extrabold text-emerald-400 text-base">Zero</div>
-              <div className="text-stone-400 text-[11px] mt-0.5">Medical Hallucinations</div>
-            </div>
-            <div>
-              <div className="font-extrabold text-amber-200 text-base">Deterministic</div>
-              <div className="text-stone-400 text-[11px] mt-0.5">Anupana &amp; Safety Checks</div>
-            </div>
+          {/* Metric Strip */}
+          <div className="pt-6">
+            <MetricStrip />
           </div>
-        </div>
 
-        {/* Ambient Sanskrit Calligraphy Watermark */}
-        <div className="absolute right-4 -bottom-10 text-[200px] font-sanskrit text-white/5 select-none pointer-events-none">
-          आयुर्वेद
         </div>
-      </section>
+      </DecorativeMemphisBackground>
 
       {/* Interactive Live Demo Sandbox */}
-      <section id="demo-sandbox" className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-3 py-1 rounded-full border border-emerald-300 dark:border-emerald-800">
-            Live Clinical Sandbox
-          </span>
-          <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">
-            See How AyurParam 2.9B Reasons Through Cases
-          </h2>
-          <p className="text-xs text-stone-500 dark:text-stone-400">
-            Click on any clinical condition below to test live diagnostic reasoning, authentic shloka citations, and deterministic Anupana validation.
-          </p>
-        </div>
-
-        {/* Demo Selector Tabs */}
-        <div className="flex justify-center gap-2">
-          <button
-            onClick={() => setDemoTab('amavata')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
-              demoTab === 'amavata'
-                ? 'bg-emerald-800 text-amber-200 shadow-md'
-                : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-800 hover:bg-stone-100'
-            }`}
-          >
-            Amavata (Rheumatoid Joint Disorder)
-          </button>
-          <button
-            onClick={() => setDemoTab('grahani')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
-              demoTab === 'grahani'
-                ? 'bg-amber-600 text-white shadow-md'
-                : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-800 hover:bg-stone-100'
-            }`}
-          >
-            Grahani Dosha (IBS / Malabsorption)
-          </button>
-          <button
-            onClick={() => setDemoTab('prameha')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
-              demoTab === 'prameha'
-                ? 'bg-indigo-700 text-white shadow-md'
-                : 'bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-800 hover:bg-stone-100'
-            }`}
-          >
-            Prameha (Metabolic / Diabetic Care)
-          </button>
-        </div>
-
-        {/* Demo Output Card */}
-        {demoCases[demoTab] && (
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-100 dark:border-stone-800 pb-4">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                  Simulated Clinical Case
-                </span>
-                <h3 className="text-xl font-bold text-stone-900 dark:text-stone-100 mt-0.5">
-                  {demoCases[demoTab].title}
-                </h3>
-                <p className="text-xs text-stone-500 mt-0.5">{demoCases[demoTab].demographics}</p>
+      <section id="demo-sandbox" className="max-w-[1240px] mx-auto px-4 sm:px-6">
+        <div className="bg-[#20194f]/95 border border-violet-400/35 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl space-y-8">
+          
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-violet-400/20 pb-6">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-extrabold text-emerald-400 uppercase tracking-wider mb-1">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Diagnostic Sandbox</span>
               </div>
-
-              <button
-                onClick={() => handleLaunchPreset(demoTab)}
-                className="bg-emerald-800 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow flex items-center space-x-1.5 transition self-start"
-              >
-                <span>Open Full Case in Dashboard</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              <h2 className="text-xl sm:text-2xl font-black text-white">Experience Classical Clinical Reasoning</h2>
+              <p className="text-xs sm:text-sm text-violet-200/70 mt-1">
+                Select a benchmark clinical presentation to test differential Lakshana mapping and Brihat Trayi grounding.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Left Side: Pathology & Prescriptions */}
-              <div className="space-y-4 text-xs">
-                <div className="p-3.5 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700 space-y-1">
-                  <span className="font-bold text-stone-700 dark:text-stone-300 block">Reported Symptoms (Lakshanas):</span>
-                  <p className="text-stone-600 dark:text-stone-400">{demoCases[demoTab].complaints}</p>
+            {/* Cyber Wing Segmented Toggles (Matching Reference Screenshot) */}
+            <div className="flex items-center flex-wrap gap-1 p-1 bg-[#171342] border border-violet-400/30 rounded-2xl">
+              {[
+                { key: 'amavata', label: 'Amavata (Arthritis)', variant: 'red' },
+                { key: 'grahani', label: 'Grahani (IBS / Agni)', variant: 'cyan' },
+                { key: 'prameha', label: 'Prameha (Diabetes)', variant: 'orange' }
+              ].map((tab) => (
+                <CyberToggle
+                  key={tab.key}
+                  active={demoTab === tab.key}
+                  onClick={() => setDemoTab(tab.key)}
+                  variant={tab.variant}
+                  size="sm"
+                >
+                  {tab.label}
+                </CyberToggle>
+              ))}
+            </div>
+          </div>
+
+          {/* Sandbox Case Details */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            {/* Left Column: Clinical Presentation & Diagnosis */}
+            <div className="lg:col-span-7 space-y-5">
+              <div className="bg-[#171342]/90 border border-violet-400/25 rounded-2xl p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-extrabold text-white">{currentCase.title}</h3>
+                  <StatusBadge status="verified" label="AyurParam Verified" />
+                </div>
+                
+                <div className="p-3 bg-violet-950/40 rounded-xl border border-violet-400/20 text-xs text-violet-200 font-medium">
+                  <strong>Patient Profile:</strong> {currentCase.demographics}
                 </div>
 
-                <div className="p-3.5 bg-emerald-50/60 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-800 space-y-1">
-                  <span className="font-bold text-emerald-900 dark:text-emerald-300 block">AyurParam 2.9B Roganirnaya:</span>
-                  <p className="text-stone-700 dark:text-stone-300">{demoCases[demoTab].diagnosis}</p>
-                </div>
-
-                <div className="p-3.5 bg-amber-50/60 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-800 space-y-1">
-                  <span className="font-bold text-amber-900 dark:text-amber-300 block">Prescribed Classical Formulation:</span>
-                  <p className="font-semibold text-stone-900 dark:text-stone-100">{demoCases[demoTab].formulation}</p>
-                  <p className="text-amber-800 dark:text-amber-300 font-medium mt-1">
-                    Mandatory Vehicle (Anupana): <strong>{demoCases[demoTab].anupana}</strong>
+                <div className="space-y-1.5 text-xs text-slate-300">
+                  <div className="font-bold text-slate-100 uppercase tracking-wide text-[11px]">Lakshanas (Reported Symptoms):</div>
+                  <p className="leading-relaxed bg-[#110e35] p-3 rounded-xl border border-violet-400/15">
+                    {currentCase.complaints}
                   </p>
                 </div>
 
-                <div className="flex items-center space-x-2 text-emerald-700 dark:text-emerald-400 font-bold">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>AyurGuard Audit: {demoCases[demoTab].safetyStatus}</span>
+                <div className="space-y-1.5 text-xs text-slate-300">
+                  <div className="font-bold text-emerald-400 uppercase tracking-wide text-[11px]">Algorithmic Samprapti Diagnosis:</div>
+                  <p className="font-semibold text-white leading-relaxed bg-[#110e35] p-3 rounded-xl border border-emerald-400/30">
+                    {currentCase.diagnosis}
+                  </p>
+                </div>
+
+                {/* Treatment & Anupana */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <div className="bg-emerald-950/40 border border-emerald-400/30 rounded-xl p-3.5 space-y-1">
+                    <div className="text-[10px] font-bold text-emerald-400 uppercase">Recommended Classical Rx:</div>
+                    <div className="text-xs font-black text-white">{currentCase.formulation}</div>
+                  </div>
+                  <div className="bg-orange-950/40 border border-orange-400/30 rounded-xl p-3.5 space-y-1">
+                    <div className="text-[10px] font-bold text-orange-400 uppercase">Mandatory Vehicle (Anupana):</div>
+                    <div className="text-xs font-black text-white">{currentCase.anupana}</div>
+                  </div>
+                </div>
+
+                {/* Launch Button */}
+                <div className="pt-2">
+                  <ChamferButton
+                    variant="primary"
+                    size="md"
+                    withArrow
+                    onClick={() => handleLaunchPreset(demoTab)}
+                    className="w-full justify-center"
+                  >
+                    Open Case in Practitioner Workspace
+                  </ChamferButton>
                 </div>
               </div>
+            </div>
 
-              {/* Right Side: Backing Shloka */}
-              <div>
-                <ShlokaCard citation={demoCases[demoTab].verse} />
+            {/* Right Column: Authenticated Shloka Verse */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="flex items-center gap-2 text-xs font-bold text-violet-200">
+                <BookOpen className="w-4 h-4 text-amber-400" />
+                <span>Grounded Brihat Trayi Authority (Aptopadesha)</span>
               </div>
+              <ShlokaCard verse={currentCase.verse} />
             </div>
-          </div>
-        )}
-      </section>
 
-      {/* Comparison: Ordinary AI vs AyuVaidya */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-950 px-3 py-1 rounded-full border border-amber-300 dark:border-amber-800">
-            Medical Safety Comparison
-          </span>
-          <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">
-            Why Ordinary Health AIs Fail in Ayurvedic Medicine
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Ordinary AI Card */}
-          <div className="bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 rounded-3xl p-6 md:p-8 space-y-4">
-            <div className="flex items-center space-x-2.5 text-rose-800 dark:text-rose-300 font-bold text-base border-b border-rose-200 dark:border-rose-800/60 pb-3">
-              <AlertTriangle className="w-5 h-5 text-rose-600" />
-              <span>General LLMs (ChatGPT, Generic AIs)</span>
-            </div>
-            <ul className="space-y-3 text-xs text-stone-700 dark:text-stone-300">
-              <li className="flex items-start space-x-2">
-                <span className="text-rose-500 font-bold">✕</span>
-                <span><strong>Hallucinates Fake Citations:</strong> Fabricates verse numbers in Charaka and Sushruta that do not exist.</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-rose-500 font-bold">✕</span>
-                <span><strong>Dangerous Anupana Omissions:</strong> Recommends taking Guggulu with cold water, causing gastric and drug obstruction.</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-rose-500 font-bold">✕</span>
-                <span><strong>No Pregnancy Guardrails:</strong> Recommends emmenagogue, purgative (Virechana), or toxic mineral preparations during gestation.</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-rose-500 font-bold">✕</span>
-                <span><strong>Ignores Viruddha Ahara:</strong> Allows dangerous food-food and drug-food combinations (e.g. fish with milk, equal parts honey + ghee).</span>
-              </li>
-            </ul>
           </div>
 
-          {/* AyuVaidya Card */}
-          <div className="bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-3xl p-6 md:p-8 space-y-4">
-            <div className="flex items-center space-x-2.5 text-emerald-800 dark:text-emerald-300 font-bold text-base border-b border-emerald-200 dark:border-emerald-800/60 pb-3">
-              <ShieldCheck className="w-5 h-5 text-emerald-600" />
-              <span>AyuVaidya (AyurParam 2.9B + AyurGuard)</span>
-            </div>
-            <ul className="space-y-3 text-xs text-stone-700 dark:text-stone-300">
-              <li className="flex items-start space-x-2">
-                <span className="text-emerald-600 font-bold">✓</span>
-                <span><strong>100% Shloka Traceability:</strong> Every diagnostic insight is grounded in authenticated Brihat Trayi verses.</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-emerald-600 font-bold">✓</span>
-                <span><strong>Deterministic Anupana Engine:</strong> Cross-references every prescription against certified adjuvant registries.</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-emerald-600 font-bold">✓</span>
-                <span><strong>Garbhini &amp; Bala Protection:</strong> Non-probabilistic hard block on contraindicated herbs for pregnant and pediatric patients.</span>
-              </li>
-              <li className="flex items-start space-x-2">
-                <span className="text-emerald-600 font-bold">✓</span>
-                <span><strong>Classical Viruddha Ahara Scanner:</strong> Strictly screens diet and lifestyle against all 18 forms of incompatibility.</span>
-              </li>
-            </ul>
-          </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section id="how-it-works" className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950 px-3 py-1 rounded-full border border-emerald-300 dark:border-emerald-800">
-            Clinical Journey
-          </span>
-          <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">
-            How AyuVaidya Works in 4 Simple Steps
+      {/* 5-Stage Precision Diagnostic Flow */}
+      <section id="how-it-works" className="max-w-[1240px] mx-auto px-4 sm:px-6 space-y-10">
+        <div className="text-center space-y-2 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-400 uppercase tracking-widest">
+            <Activity className="w-3.5 h-3.5" />
+            <span>Clinical Pipeline Architecture</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            How AyuVaidya Bridges Ancient Logic &amp; Modern Safety
           </h2>
+          <p className="text-xs sm:text-sm text-violet-200/70">
+            A 5-layer deterministic clinical workflow ensuring verifiable Ayurvedic reasoning without AI hallucinations.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-sm">
-              1
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {[
+            {
+              step: '01',
+              title: 'Pariksha Intake',
+              desc: 'Structured Ashtavidha Pariksha, Rogi Bala, Agni assessment, and cardinal Lakshana collection.',
+              icon: Stethoscope,
+              color: 'text-emerald-400',
+              border: 'border-emerald-400/40'
+            },
+            {
+              step: '02',
+              title: 'Epistemic Grounding',
+              desc: 'Tri-Pramana validation: Aptopadesha (texts), Pratyaksha (observation), and Anumana (inference).',
+              icon: BookOpen,
+              color: 'text-amber-400',
+              border: 'border-amber-400/40'
+            },
+            {
+              step: '03',
+              title: 'Shat Kriya Kala',
+              desc: 'Pathological stage tracing: Sanchaya, Prakopa, Prasara, Sthana Samshraya, Vyakti, and Bheda.',
+              icon: Activity,
+              color: 'text-violet-400',
+              border: 'border-violet-400/40'
+            },
+            {
+              step: '04',
+              title: 'AyurParam 2.9B',
+              desc: 'Specialized 2.9B LLM trained on classical Sanskrit commentaries and formulations.',
+              icon: Cpu,
+              color: 'text-sky-400',
+              border: 'border-sky-400/40'
+            },
+            {
+              step: '05',
+              title: 'AyurGuard Firewall',
+              desc: 'Hardcoded deterministic safety rules blocking pregnancy, vehicle, and heavy-metal contraindications.',
+              icon: ShieldCheck,
+              color: 'text-orange-400',
+              border: 'border-orange-400/40'
+            }
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
+                key={item.step}
+                className={`bg-[#20194f]/80 border ${item.border} rounded-2xl p-5 space-y-3 shadow-xl backdrop-blur-md relative overflow-hidden group hover:-translate-y-1 transition-transform duration-200`}
+              >
+                <div className="text-3xl font-black text-violet-400/20 absolute -top-1 -right-1 font-mono select-none">
+                  {item.step}
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-violet-950/70 border border-violet-400/30 flex items-center justify-center">
+                  <Icon className={`w-5 h-5 ${item.color}`} />
+                </div>
+                <h3 className="text-sm font-extrabold text-white">{item.title}</h3>
+                <p className="text-xs text-violet-200/70 leading-relaxed">
+                  {item.desc}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Brihat Trayi Classical Grounding Section */}
+      <section id="brihat-trayi" className="max-w-[1240px] mx-auto px-4 sm:px-6">
+        <div className="bg-[#171342]/95 border border-violet-400/35 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl space-y-8">
+          
+          <div className="text-center space-y-2 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase tracking-widest">
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Canonical Corpus Grounding</span>
             </div>
-            <h4 className="font-bold text-sm text-stone-900 dark:text-stone-100">Personalized Pariksha</h4>
-            <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
-              Step-by-step intake covering Prakriti, Agni, Koshtha, Ashtavidha Pariksha, and chief symptoms.
+            <h2 className="text-2xl sm:text-3xl font-black text-white">The Brihat Trayi Foundation</h2>
+            <p className="text-xs sm:text-sm text-violet-200/70">
+              Every diagnostic rule and therapeutic suggestion links to specific verses from the Great Triad of Ayurveda.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 font-bold flex items-center justify-center text-sm">
-              2
-            </div>
-            <h4 className="font-bold text-sm text-stone-900 dark:text-stone-100">Samprapti Modeling</h4>
-            <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
-              AyurParam 2.9B deconstructs the 6 stages of Shat Kriya Kala and traces the disease on an Ayurvedic knowledge graph.
-            </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                treatise: 'Charaka Samhita',
+                authority: 'Acharya Charaka',
+                focus: 'Kayachikitsa (Internal Medicine) & Nidana Sthana',
+                shlokas: 'Sutra, Nidana, Chikitsa Sthana',
+                quote: 'शान्तेऽग्नौ म्रियते, युक्ते चिरं जीवत्यनामयः (CS.Chi.15.51)',
+                tag: 'Primary Internal Medicine'
+              },
+              {
+                treatise: 'Sushruta Samhita',
+                authority: 'Acharya Sushruta',
+                focus: 'Shalya Tantra (Surgical Logic) & Sharira Sthana',
+                shlokas: 'Sutra & Sharira Sthana',
+                quote: 'समादोषः समाग्निश्च समधातुमलक्रियः (SS.Su.15.41)',
+                tag: 'Surgical & Anatomical'
+              },
+              {
+                treatise: 'Ashtanga Hridaya',
+                authority: 'Acharya Vagbhata',
+                focus: 'Condensed Clinical Quintessence & Daily Regimen',
+                shlokas: 'Sutra, Nidana & Chikitsa Sthana',
+                quote: 'रोगाः सर्वेऽपि मन्देऽग्नौ सुतरामुदराणि तु (AH.Ni.12.01)',
+                tag: 'Clinical Synthesis'
+              }
+            ].map((t) => (
+              <div
+                key={t.treatise}
+                className="bg-[#20194f] border border-violet-400/30 rounded-2xl p-6 space-y-4 shadow-lg hover:border-emerald-400/50 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-violet-950 text-violet-300 border border-violet-400/30">
+                    {t.tag}
+                  </span>
+                  <BookOpen className="w-4 h-4 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-white">{t.treatise}</h3>
+                  <p className="text-xs text-emerald-400 font-semibold">{t.authority}</p>
+                </div>
+                <p className="text-xs text-violet-200/80 leading-relaxed">
+                  {t.focus}
+                </p>
+                <div className="p-3 bg-[#110e35] rounded-xl border border-violet-400/20 text-xs font-sanskrit text-amber-200/90 italic">
+                  "{t.quote}"
+                </div>
+              </div>
+            ))}
           </div>
 
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-800 font-bold flex items-center justify-center text-sm">
-              3
+        </div>
+      </section>
+
+      {/* AyurGuard Deterministic Safety Gate */}
+      <section id="safety-engine" className="max-w-[1240px] mx-auto px-4 sm:px-6">
+        <div className="bg-gradient-to-br from-[#20194f] to-[#120f38] border border-orange-500/30 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-orange-400 uppercase tracking-widest">
+                <ShieldCheck className="w-3.5 h-3.5 text-orange-400" />
+                <span>Deterministic Clinical Safety</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-white">AyurGuard Safety Gate</h2>
+              <p className="text-xs sm:text-sm text-violet-200/70 max-w-xl">
+                Independent rule-based firewall that inspects every therapeutic proposal before delivery.
+              </p>
             </div>
-            <h4 className="font-bold text-sm text-stone-900 dark:text-stone-100">Brihat Trayi Grounding</h4>
-            <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
-              Hybrid RAG retrieves backing verses from Charaka, Sushruta, and Vagbhata in original Sanskrit and translation.
-            </p>
+            <ChamferButton
+              variant="orange"
+              size="md"
+              onClick={() => navigate('/safety')}
+            >
+              Inspect AyurGuard Rules
+            </ChamferButton>
           </div>
 
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 space-y-3 shadow-sm">
-            <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 font-bold flex items-center justify-center text-sm">
-              4
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+            <div className="p-4 bg-rose-950/40 border border-rose-500/40 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2 text-rose-300 font-extrabold text-xs">
+                <AlertTriangle className="w-4 h-4 shrink-0" />
+                <span>Garbhini (Pregnancy) Gate</span>
+              </div>
+              <p className="text-xs text-violet-200/80 leading-relaxed">
+                Blocks intense purgatives (Tikshna Virechana), abortifacient herbs (Kasisadi), and high-potency mineral bhasmas.
+              </p>
             </div>
-            <h4 className="font-bold text-sm text-stone-900 dark:text-stone-100">AyurGuard Certification</h4>
-            <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
-              Deterministic rule firewall validates Anupana, screens contraindications, and certifies prescription safety.
-            </p>
+
+            <div className="p-4 bg-orange-950/40 border border-orange-500/40 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2 text-orange-300 font-extrabold text-xs">
+                <Flame className="w-4 h-4 shrink-0" />
+                <span>Anupana (Vehicle) Gate</span>
+              </div>
+              <p className="text-xs text-violet-200/80 leading-relaxed">
+                Prevents fatal dietetic incompatibilities like heated honey (Ushna Madhu) or cold water with resinous Guggulu.
+              </p>
+            </div>
+
+            <div className="p-4 bg-amber-950/40 border border-amber-500/40 rounded-2xl space-y-2">
+              <div className="flex items-center gap-2 text-amber-300 font-extrabold text-xs">
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>Dose &amp; Toxicity Guard</span>
+              </div>
+              <p className="text-xs text-violet-200/80 leading-relaxed">
+                Restricts heavy metal purification requirements (Shodhana) and flags excessive usage duration beyond clinical limits.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* The Brihat Trayi Section */}
-      <section id="brihat-trayi" className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
-        <div className="text-center max-w-2xl mx-auto space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-950 px-3 py-1 rounded-full border border-indigo-300 dark:border-indigo-800">
-            Classical Authority
-          </span>
-          <h2 className="text-2xl font-bold text-stone-900 dark:text-stone-100">
-            The Three Canonical Treatises (Brihat Trayi)
-          </h2>
+      {/* Interactive FAQ Section */}
+      <section id="faq" className="max-w-[1240px] mx-auto px-4 sm:px-6 space-y-6">
+        <div className="text-center space-y-2 max-w-xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-violet-300 uppercase tracking-widest">
+            <HelpCircle className="w-3.5 h-3.5 text-violet-400" />
+            <span>Frequently Asked Questions</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-white">Understanding AyuVaidya</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 space-y-3 shadow-sm">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">8 Sthanas &bull; 120 Chapters</span>
-            <h3 className="font-bold text-base text-stone-900 dark:text-stone-100">Charaka Samhita</h3>
-            <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
-              The foundational authority on internal medicine (Kayachikitsa), etiology (Nidana), pharmacology (Dravyaguna), and treatment principles (Chikitsa).
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 space-y-3 shadow-sm">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400">6 Sthanas &bull; 186 Chapters</span>
-            <h3 className="font-bold text-base text-stone-900 dark:text-stone-100">Sushruta Samhita</h3>
-            <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
-              The supreme authority on surgical science (Shalya Tantra), anatomical structures (Sharira), and the canonical definition of health (Svastha).
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 space-y-3 shadow-sm">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-800 dark:text-indigo-400">6 Sthanas &bull; Complete Synthesis</span>
-            <h3 className="font-bold text-base text-stone-900 dark:text-stone-100">Ashtanga Hridaya</h3>
-            <p className="text-xs text-stone-600 dark:text-stone-400 leading-relaxed">
-              Vagbhata’s elegant synthesis of Charaka and Sushruta, renowned for clear daily lifestyle regimens (Dinacharya) and clinical formulas.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section id="faq" className="max-w-4xl mx-auto px-4 sm:px-6 space-y-4">
-        <div className="text-center space-y-1 pb-4">
-          <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-xs text-stone-500">Everything you need to know about AyuVaidya and AyurParam 2.9B.</p>
-        </div>
-
-        <div className="space-y-2">
-          {faqs.map((f, i) => (
+        <div className="max-w-3xl mx-auto space-y-3">
+          {faqs.map((faq, idx) => (
             <div
-              key={i}
-              className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-4 transition"
+              key={idx}
+              className="bg-[#20194f] border border-violet-400/30 rounded-2xl overflow-hidden shadow-lg transition-all"
             >
               <button
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="w-full flex items-center justify-between text-left font-bold text-xs text-stone-800 dark:text-stone-200"
+                type="button"
+                onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                className="w-full px-6 py-4 flex items-center justify-between text-left text-sm font-bold text-white hover:text-emerald-300 transition"
               >
-                <span>{f.q}</span>
-                {openFaq === i ? <ChevronUp className="w-4 h-4 text-emerald-600" /> : <ChevronDown className="w-4 h-4 text-stone-400" />}
+                <span>{faq.q}</span>
+                {openFaq === idx ? (
+                  <ChevronUp className="w-4 h-4 text-emerald-400 shrink-0" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-violet-400 shrink-0" />
+                )}
               </button>
-              {openFaq === i && (
-                <p className="text-xs text-stone-600 dark:text-stone-400 mt-2.5 pt-2.5 border-t border-stone-100 dark:border-stone-800 leading-relaxed">
-                  {f.a}
-                </p>
+              {openFaq === idx && (
+                <div className="px-6 pb-5 pt-1 text-xs text-violet-200/80 leading-relaxed border-t border-violet-400/15">
+                  {faq.a}
+                </div>
               )}
             </div>
           ))}
         </div>
       </section>
 
-      {/* Bottom CTA Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-gradient-to-r from-emerald-900 to-stone-900 text-white rounded-3xl p-8 md:p-12 text-center space-y-5 shadow-xl border border-emerald-800/40">
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
-            Ready for Safe, Source-Grounded Ayurvedic Clinical Intelligence?
-          </h2>
-          <p className="text-stone-300 text-xs md:text-sm max-w-xl mx-auto">
-            Experience complete Rogi-Roga Pariksha, automated Samprapti modeling, and physician-grounded Chikitsa planning today.
-          </p>
-          <div className="pt-2">
-            <button
-              onClick={handleStartOnboarding}
-              className="bg-amber-400 hover:bg-amber-300 text-stone-950 font-extrabold text-xs md:text-sm px-8 py-3.5 rounded-xl shadow-lg transition transform hover:-translate-y-0.5 inline-flex items-center space-x-2"
-            >
-              <span>Begin Personalized Intake Now</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
-      <footer className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 border-t border-stone-200 dark:border-stone-800 text-center text-xs text-stone-500 space-y-2">
-        <p>AyuVaidya &bull; National Open Ayurveda AI Challenge 2026–27 &bull; Techfest, IIT Bombay in collaboration with Ministry of Ayush &amp; AIIA</p>
-        <p className="text-[11px] text-stone-400">Open-source under MIT License. Grounded on authentic Brihat Trayi treatises for qualified Vaidyas and researchers.</p>
+      <footer className="max-w-[1240px] mx-auto px-4 sm:px-6 pt-10 border-t border-violet-400/20 text-xs text-violet-300/70 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-2 font-bold text-white">
+          <div className="w-6 h-6 rounded-lg bg-emerald-500 flex items-center justify-center text-slate-950 font-sanskrit">
+            ॐ
+          </div>
+          <span>AyuVaidya &bull; National Open Ayurveda AI Challenge 2026–27</span>
+        </div>
+        <div>
+          Anchored in Charaka, Sushruta &amp; Ashtanga Hridaya &bull; Techfest, IIT Bombay
+        </div>
       </footer>
 
     </div>

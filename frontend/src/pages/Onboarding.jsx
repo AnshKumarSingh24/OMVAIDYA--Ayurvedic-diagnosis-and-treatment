@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
@@ -17,14 +17,20 @@ import {
   User,
   Check
 } from 'lucide-react';
+import { normalizeClinicalText } from '../utils/normalization';
 import VaidyaCompanion from '../components/VaidyaCompanion';
+import ChamferButton from '../components/ChamferButton';
+import CyberToggle from '../components/CyberToggle';
 import { api } from '../services/api';
+import OmVaidyaIntroSplash from '../components/OmVaidyaIntroSplash';
 
 export default function Onboarding({ onPatientCreated }) {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [synthesisStage, setSynthesisStage] = useState(0);
+  const [createdPatientId, setCreatedPatientId] = useState(null);
+  const createdIdRef = useRef(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -32,8 +38,10 @@ export default function Onboarding({ onPatientCreated }) {
     age: '35',
     gender: 'Female',
     // Prakriti selections
-    frame: 'medium',       // slim (Vata), medium (Pitta), broad (Kapha)
+    frame: 'medium',       // slim (Vata), medium (Pitta), broad (Kapha), other
+    customFrame: '',
     skin: 'warm',          // dry/cold (Vata), warm/sensitive (Pitta), smooth/oily (Kapha)
+    customSkin: '',
     energy: 'steady',      // variable/quick (Vata), intense/driven (Pitta), calm/steady (Kapha)
     stress: 'anxious',     // anxiety/worry (Vata), irritability/frustration (Pitta), withdrawal/calm (Kapha)
     // Agni & Gut
@@ -69,37 +77,99 @@ export default function Onboarding({ onPatientCreated }) {
     });
   };
 
-  // Derive calculated Prakriti
-  const calculatePrakriti = () => {
+  // Derive calculated Prakriti with Dosha Score Breakdown
+  const calculatePrakritiScores = () => {
     let v = 0, p = 0, k = 0;
-    if (formData.frame === 'slim') v += 2; else if (formData.frame === 'medium') p += 2; else k += 2;
-    if (formData.skin === 'dry') v += 2; else if (formData.skin === 'warm') p += 2; else k += 2;
-    if (formData.energy === 'variable') v += 2; else if (formData.energy === 'intense') p += 2; else k += 2;
-    if (formData.stress === 'anxious') v += 2; else if (formData.stress === 'irritable') p += 2; else k += 2;
+    
+    // 1. Frame scoring
+    if (formData.frame === 'slim') {
+      v += 3;
+    } else if (formData.frame === 'medium') {
+      p += 3;
+    } else if (formData.frame === 'broad') {
+      k += 3;
+    } else if (formData.frame === 'other') {
+      const lower = (formData.customFrame || '').toLowerCase();
+      if (lower.includes('vata') || lower.includes('fluctuat') || lower.includes('delicate') || lower.includes('asymmetr') || lower.includes('thin')) {
+        v += 3;
+      } else if (lower.includes('pitta') || lower.includes('muscul') || lower.includes('athletic') || lower.includes('lean')) {
+        p += 3;
+      } else if (lower.includes('kapha') || lower.includes('heavy') || lower.includes('dense') || lower.includes('stocky')) {
+        k += 3;
+      } else {
+        v += 1; p += 1; k += 1;
+      }
+    }
 
-    if (v >= p && v >= k && p >= k) return 'Vata-Pitta';
-    if (v >= p && v >= k && k >= p) return 'Vata-Kapha';
-    if (p >= v && p >= k && v >= k) return 'Pitta-Vata';
-    if (p >= v && p >= k && k >= v) return 'Pitta-Kapha';
-    if (k >= v && k >= p && p >= v) return 'Kapha-Pitta';
-    return 'Vata-Kapha';
+    // 2. Skin scoring
+    if (formData.skin === 'dry') v += 3;
+    else if (formData.skin === 'warm') p += 3;
+    else k += 3;
+
+    // 3. Energy & Stress
+    if (formData.energy === 'variable') v += 2;
+    else if (formData.energy === 'intense') p += 2;
+    else k += 2;
+
+    if (formData.stress === 'anxious') v += 2;
+    else if (formData.stress === 'irritable') p += 2;
+    else k += 2;
+
+    const total = v + p + k || 1;
+    const vPct = Math.round((v / total) * 100);
+    const pPct = Math.round((p / total) * 100);
+    const kPct = Math.max(0, 100 - (vPct + pPct));
+
+    let type = 'Vata-Kapha';
+    if (v >= p && v >= k && p >= k) type = 'Vata-Pitta';
+    else if (v >= p && v >= k && k >= p) type = 'Vata-Kapha';
+    else if (p >= v && p >= k && v >= k) type = 'Pitta-Vata';
+    else if (p >= v && p >= k && k >= v) type = 'Pitta-Kapha';
+    else if (k >= v && k >= p && p >= v) type = 'Kapha-Pitta';
+    else if (k >= v && k >= p && v >= p) type = 'Kapha-Vata';
+    else type = 'Tridoshic (Sama)';
+
+    return { type, v, p, k, vPct, pPct, kPct };
   };
 
+  const calculatePrakriti = () => calculatePrakritiScores().type;
+
   const getCompanionMessage = () => {
+    if (formData.gender === 'Male') {
+      switch (step) {
+        case 1:
+          return "Namaste! I am your AyuVaidya clinical guide. Let's record your basic demographic profile so we can calibrate dosage and Rogi Bala.";
+        case 2:
+          return "Prakriti is your unique bodily constitution established at conception. Select the baseline physical and metabolic traits that describe you.";
+        case 3:
+          return "Agni is your digestive fire—the root cause of all health and disease in Ayurveda. How does your stomach and digestion typically behave?";
+        case 4:
+          return "Tell me what symptoms (Lakshanas) you are experiencing today. You can select the chips below or add clinical notes.";
+        default:
+          return "Synthesizing your personalized Ayurvedic case workspace...";
+      }
+    }
     switch (step) {
       case 1:
-        return "Namaste! I am your AyuVaidya clinical guide. Let's start with your basic profile so we can calibrate your care.";
+        return "Namaste! I am your AyuVaidya clinical guide. Let's record your basic demographic profile so we can calibrate dosage and Rogi Bala.";
       case 2:
-        return "Prakriti is your unique bodily constitution decided at birth. Select the traits that describe your natural tendencies!";
+        return "Prakriti is your unique bodily constitution established at conception. Select the baseline physical and metabolic traits that describe you.";
       case 3:
-        return "Agni is your digestive fire—the root cause of all health and disease in Ayurveda. How does your stomach feel?";
+        return "Agni is your digestive fire—the root cause of all health and disease in Ayurveda. How does your stomach and digestion typically behave?";
       case 4:
-        return "AyurGuard strictly blocks dangerous herbs for pregnant or nursing individuals. Let us know so your safety is guaranteed.";
+        return "AyurGuard strictly blocks emmenagogues and toxic herbs for pregnant or nursing individuals. Let us know so your safety is guaranteed.";
       case 5:
-        return "Tell me what symptoms you are experiencing today. You can select the chips below or type in details.";
+        return "Tell me what symptoms (Lakshanas) you are experiencing today. You can select the chips below or add clinical notes.";
       default:
-        return "Synthesizing your personalized Ayurvedic care plan...";
+        return "Synthesizing your personalized Ayurvedic case workspace...";
     }
+  };
+
+  const getCompanionMood = () => {
+    if (step === 2) return 'thoughtful';
+    if (formData.gender !== 'Male' && step === 4) return 'thoughtful';
+    if ((formData.gender === 'Male' && step === 4) || step === 5) return 'processing';
+    return 'calm';
   };
 
   const handleCompleteIntake = async () => {
@@ -111,18 +181,25 @@ export default function Onboarding({ onPatientCreated }) {
     setTimeout(() => setSynthesisStage(3), 2500);
 
     const derivedPrakriti = calculatePrakriti();
-    const chiefComplaints = formData.symptoms.length > 0
-      ? formData.symptoms
-      : [formData.customNotes || 'General health evaluation & joint wellness'];
+    const cleanNotes = normalizeClinicalText(formData.customNotes);
+    const selectedSymptoms = formData.symptoms.map(s => normalizeClinicalText(s)).filter(Boolean);
 
-    if (formData.customNotes && !formData.symptoms.includes(formData.customNotes)) {
-      chiefComplaints.push(formData.customNotes);
+    // If user provided custom notes (their unlisted condition), prioritize it as primary problem
+    let chiefComplaintsText = '';
+    if (cleanNotes) {
+      chiefComplaintsText = selectedSymptoms.length > 0
+        ? `${cleanNotes} (Accompanying signs: ${selectedSymptoms.join(', ')})`
+        : cleanNotes;
+    } else if (selectedSymptoms.length > 0) {
+      chiefComplaintsText = selectedSymptoms.join(', ');
+    } else {
+      chiefComplaintsText = 'General health evaluation & wellness inquiry';
     }
 
     try {
       // 1. Create Patient in Database
       const pRes = await api.createPatient({
-        full_name: formData.name || 'Patient',
+        full_name: normalizeClinicalText(formData.name) || 'Patient',
         age: Number(formData.age),
         gender: formData.gender,
         prakriti: derivedPrakriti,
@@ -130,36 +207,58 @@ export default function Onboarding({ onPatientCreated }) {
         koshtha: formData.koshtha,
         bala: 'Madhyama',
         current_season: formData.season,
-        is_pregnant: formData.isPregnant,
-        is_lactating: formData.isLactating
+        is_pregnant: formData.gender === 'Male' ? false : formData.isPregnant,
+        is_lactating: formData.gender === 'Male' ? false : formData.isLactating
       });
 
       const newId = pRes.patient_id;
+      setCreatedPatientId(newId);
+      createdIdRef.current = newId;
 
-      // 2. Run AyurParam 2.9B Analysis & Save Consultation
-      await api.analyzeConsultation({
-        patient_id: newId,
-        patient_name: formData.name || 'Patient',
-        age: Number(formData.age),
-        gender: formData.gender,
-        is_pregnant: formData.isPregnant,
-        is_lactating: formData.isLactating,
-        prakriti: derivedPrakriti,
-        agni: formData.agni,
-        koshtha: formData.koshtha,
-        bala: 'Madhyama',
-        current_season: formData.season,
-        chief_complaints: chiefComplaints,
-        duration: formData.duration,
-        save_to_patient: true
+      // 2. Initialize Persistent Active Case Session with Facts (deduplicated)
+      const frameDesc = formData.frame === 'other' && formData.customFrame
+        ? `Custom Frame: ${formData.customFrame}`
+        : `${formData.frame} build`;
+      const initialFacts = [
+        { category: 'lifestyle', key: 'prakriti_frame_energy', value: `${frameDesc}, ${formData.energy} energy pattern` },
+        { category: 'lifestyle', key: 'stress_response', value: formData.stress }
+      ];
+      if (formData.customFrame) {
+        initialFacts.push({ category: 'prakriti', key: 'body_build_morphology', value: formData.customFrame });
+      }
+      if (cleanNotes) {
+        initialFacts.push({
+          category: 'symptom',
+          key: 'user_described_problem',
+          value: cleanNotes,
+          confidence: 1.0,
+          confirmed_by_clinician: true
+        });
+      }
+      selectedSymptoms.forEach(sym => {
+        initialFacts.push({
+          category: 'symptom',
+          key: sym.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0, 30),
+          value: sym,
+          confidence: 1.0,
+          confirmed_by_clinician: true
+        });
       });
 
-      localStorage.setItem('ayuvaidya_onboarded', 'true');
+      const caseRes = await api.createCase({
+        patient_id: newId,
+        chief_problem: chiefComplaintsText,
+        duration: formData.duration,
+        initial_facts: initialFacts
+      });
 
-      setTimeout(() => {
-        if (onPatientCreated) onPatientCreated(newId);
-        navigate('/');
-      }, 3400);
+      // 3. Run Initial Analysis Snapshot on Active Case
+      if (caseRes && caseRes.id) {
+        await api.analyzeCase(caseRes.id);
+      }
+
+      localStorage.setItem('ayuvaidya_onboarded', 'true');
+      // The OmVaidyaIntroSplash screen persists and advances cleanly via user click or its persist timer
 
     } catch (err) {
       console.error('Onboarding failed:', err);
@@ -168,129 +267,140 @@ export default function Onboarding({ onPatientCreated }) {
     }
   };
 
-  return (
-    <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
+  const totalSteps = formData.gender === 'Male' ? 4 : 5;
 
-      {/* Progress Header */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-xs text-stone-500 font-semibold">
+  const stepsList = formData.gender === 'Male'
+    ? [
+        { num: 1, title: 'Profile' },
+        { num: 2, title: 'Prakriti' },
+        { num: 3, title: 'Agni Fire' },
+        { num: 4, title: 'Lakshanas' }
+      ]
+    : [
+        { num: 1, title: 'Profile' },
+        { num: 2, title: 'Prakriti' },
+        { num: 3, title: 'Agni Fire' },
+        { num: 4, title: 'AyurGuard' },
+        { num: 5, title: 'Lakshanas' }
+      ];
+
+  return (
+    <div className="max-w-2xl mx-auto py-6 px-4 space-y-6">
+
+      {/* Progress & Stepper */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between text-xs font-bold text-violet-300">
           <button
             onClick={() => navigate('/landing')}
-            className="hover:text-emerald-700 flex items-center gap-1 text-[11px]"
+            className="hover:text-emerald-400 flex items-center gap-1.5 transition"
           >
-            &larr; Return to Landing Page
+            &larr; Return to Landing
           </button>
-          <span>Step {step} of 5</span>
+          <span className="px-2.5 py-0.5 rounded-full bg-violet-950/70 border border-violet-400/30 text-emerald-300">
+            Step {step} of {totalSteps} &bull; {stepsList[step - 1].title}
+          </span>
         </div>
 
-        {/* Progress Bar */}
-        <div className="w-full bg-stone-200 dark:bg-stone-800 h-2 rounded-full overflow-hidden">
-          <div
-            className="bg-gradient-to-r from-emerald-600 to-amber-500 h-full transition-all duration-300 rounded-full"
-            style={{ width: `${(step / 5) * 100}%` }}
-          ></div>
+        {/* Stepper Dots & Progress Bar */}
+        <div className="flex items-center justify-between relative px-2">
+          <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-1 bg-violet-950/80 rounded-full z-0 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-emerald-400 to-orange-400 transition-all duration-300"
+              style={{ width: `${((step - 1) / (totalSteps - 1)) * 100}%` }}
+            />
+          </div>
+
+          {stepsList.map((s) => (
+            <div
+              key={s.num}
+              onClick={() => s.num < step && setStep(s.num)}
+              className={`relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all ${
+                s.num === step
+                  ? 'bg-emerald-400 text-[#0c1b2d] shadow-[0_0_15px_rgba(74,222,128,0.5)] scale-110'
+                  : s.num < step
+                  ? 'bg-violet-800 text-emerald-300 cursor-pointer border border-emerald-400/50'
+                  : 'bg-[#20194f] text-slate-400 border border-violet-400/30'
+              }`}
+            >
+              {s.num < step ? '✓' : s.num}
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Vaidya Companion Message Bubble */}
-      <VaidyaCompanion message={getCompanionMessage()} />
+      <VaidyaCompanion
+        message={getCompanionMessage()}
+        mood={getCompanionMood()}
+      />
 
-      {/* ============================================================ */}
-      {/* SYNTHESIZING MODAL / STATE */}
-      {/* ============================================================ */}
+      {/* ॐ Vaidya Cinematic Entrance Ceremony Screen */}
       {isSynthesizing ? (
-        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-10 text-center space-y-6 shadow-xl">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 mx-auto flex items-center justify-center text-3xl animate-bounce">
-            🌿
-          </div>
-
-          <div className="space-y-2">
-            <h2 className="text-xl font-extrabold text-stone-900 dark:text-stone-100">
-              AyurParam 2.9B Synthesizing Case...
-            </h2>
-            <p className="text-xs text-stone-500">
-              Please wait while our reasoning engine computes your personalized Ayurvedic care plan.
-            </p>
-          </div>
-
-          <div className="space-y-3 max-w-sm mx-auto text-left text-xs font-semibold">
-            <div className={`p-3 rounded-xl border flex items-center space-x-3 transition ${
-              synthesisStage >= 1
-                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 text-emerald-900 dark:text-emerald-300'
-                : 'bg-stone-50 text-stone-400 border-stone-200'
-            }`}>
-              <CheckCircle2 className={`w-4 h-4 ${synthesisStage >= 1 ? 'text-emerald-600' : 'text-stone-300'}`} />
-              <span>Deconstructing Samprapti &amp; Dosha imbalances</span>
-            </div>
-
-            <div className={`p-3 rounded-xl border flex items-center space-x-3 transition ${
-              synthesisStage >= 2
-                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 text-emerald-900 dark:text-emerald-300'
-                : 'bg-stone-50 text-stone-400 border-stone-200'
-            }`}>
-              <CheckCircle2 className={`w-4 h-4 ${synthesisStage >= 2 ? 'text-emerald-600' : 'text-stone-300'}`} />
-              <span>Grounded retrieval from Brihat Trayi treatises</span>
-            </div>
-
-            <div className={`p-3 rounded-xl border flex items-center space-x-3 transition ${
-              synthesisStage >= 3
-                ? 'bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 text-emerald-900 dark:text-emerald-300'
-                : 'bg-stone-50 text-stone-400 border-stone-200'
-            }`}>
-              <CheckCircle2 className={`w-4 h-4 ${synthesisStage >= 3 ? 'text-emerald-600' : 'text-stone-300'}`} />
-              <span>AyurGuard Anupana &amp; Contraindication certification</span>
-            </div>
-          </div>
-        </div>
+        <OmVaidyaIntroSplash
+          patientName={formData.name || 'Patient'}
+          prakriti={calculatePrakriti()}
+          autoAdvanceSeconds={4.8}
+          onComplete={() => {
+            const targetId = createdIdRef.current || createdPatientId || 67;
+            if (onPatientCreated) onPatientCreated(targetId);
+            navigate(`/case/${targetId}`);
+          }}
+        />
       ) : (
 
-        /* ============================================================ */
-        /* STEP-BY-STEP QUESTION WIZARD */
-        /* ============================================================ */
-        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        /* Wizard Card */
+        <div className="bg-[#20194f]/95 border border-violet-400/35 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl space-y-6">
 
           {/* STEP 1: Basic Demographics */}
           {step === 1 && (
             <div className="space-y-4">
-              <div className="border-b border-stone-100 dark:border-stone-800 pb-3">
-                <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">
-                  Section 1
+              <div className="border-b border-violet-400/20 pb-3">
+                <span className="text-[10px] uppercase font-extrabold text-emerald-400 tracking-wider">
+                  Section 1 &bull; Identification
                 </span>
-                <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+                <h3 className="text-lg font-black text-white">
                   Welcome! What should we call you?
                 </h3>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">Your Full Name:</label>
+                <label className="block text-xs font-bold text-violet-200 mb-1">Your Full Name:</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="e.g. Ananya Sharma"
-                  className="w-full border border-stone-300 dark:border-stone-700 dark:bg-stone-800 rounded-xl p-3 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full bg-[#171342] border border-violet-400/40 rounded-xl p-3 text-xs text-white focus:ring-2 focus:ring-emerald-400 focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">Your Age:</label>
+                  <label className="block text-xs font-bold text-violet-200 mb-1">Your Age:</label>
                   <input
                     type="number"
                     min="1"
                     max="115"
                     value={formData.age}
                     onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                    className="w-full border border-stone-300 dark:border-stone-700 dark:bg-stone-800 rounded-xl p-3 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    className="w-full bg-[#171342] border border-violet-400/40 rounded-xl p-3 text-xs text-white focus:ring-2 focus:ring-emerald-400 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">Gender:</label>
+                  <label className="block text-xs font-bold text-violet-200 mb-1">Gender:</label>
                   <select
                     value={formData.gender}
-                    onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                    className="w-full border border-stone-300 dark:border-stone-700 dark:bg-stone-800 rounded-xl p-3 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    onChange={(e) => {
+                      const g = e.target.value;
+                      setFormData({
+                        ...formData,
+                        gender: g,
+                        isPregnant: g === 'Male' ? false : formData.isPregnant,
+                        isLactating: g === 'Male' ? false : formData.isLactating
+                      });
+                    }}
+                    className="w-full bg-[#171342] border border-violet-400/40 rounded-xl p-3 text-xs text-white focus:ring-2 focus:ring-emerald-400 focus:outline-none"
                   >
                     <option value="Female">Female</option>
                     <option value="Male">Male</option>
@@ -304,89 +414,199 @@ export default function Onboarding({ onPatientCreated }) {
           {/* STEP 2: Prakriti (Mind-Body Constitution) */}
           {step === 2 && (
             <div className="space-y-4">
-              <div className="border-b border-stone-100 dark:border-stone-800 pb-3">
-                <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">
-                  Section 2
+              <div className="border-b border-violet-400/20 pb-3">
+                <span className="text-[10px] uppercase font-extrabold text-emerald-400 tracking-wider">
+                  Section 2 &bull; Constitutional Baselines
                 </span>
-                <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+                <h3 className="text-lg font-black text-white">
                   Discover Your Prakriti (Constitution)
                 </h3>
-                <p className="text-xs text-stone-500 mt-0.5">Select the physical traits that best describe your natural baseline.</p>
+                <p className="text-xs text-violet-200/70 mt-0.5">Select the physical traits that best describe your natural baseline.</p>
               </div>
 
               {/* Physical Frame */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300">1. Body Build &amp; Weight:</label>
-                <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-white flex items-center gap-1.5">
+                    <span>1. Body Build &amp; Frame:</span>
+                  </label>
+                  {formData.frame === 'other' && (
+                    <span className="text-[10px] font-mono text-purple-300 bg-purple-950/70 border border-purple-500/40 px-2.5 py-0.5 rounded-full">
+                      Custom Specification Active
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-2 p-2.5 bg-[#171342] border border-violet-400/30 rounded-2xl">
                   {[
-                    { id: 'slim', label: 'Slender / Hard to gain weight', tag: 'Vata' },
-                    { id: 'medium', label: 'Moderate / Athletic build', tag: 'Pitta' },
-                    { id: 'broad', label: 'Broad / Heavy bone frame', tag: 'Kapha' }
+                    { id: 'slim', label: 'Slender / Hard to gain weight (Vata)', variant: 'cyan' },
+                    { id: 'medium', label: 'Moderate / Athletic build (Pitta)', variant: 'orange' },
+                    { id: 'broad', label: 'Broad / Heavy bone frame (Kapha)', variant: 'mint' },
+                    { id: 'other', label: 'Other / Custom Body Build...', variant: 'violet' }
                   ].map(item => (
-                    <button
+                    <CyberToggle
                       key={item.id}
-                      type="button"
+                      active={formData.frame === item.id}
                       onClick={() => setFormData({ ...formData, frame: item.id })}
-                      className={`p-3 rounded-xl border text-xs text-left transition ${
-                        formData.frame === item.id
-                          ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 font-bold'
-                          : 'border-stone-200 dark:border-stone-700 hover:border-stone-400'
-                      }`}
+                      variant={item.variant}
+                      size="sm"
                     >
-                      <div className="text-[10px] uppercase text-stone-400">{item.tag}</div>
-                      <div>{item.label}</div>
-                    </button>
+                      {item.label}
+                    </CyberToggle>
                   ))}
                 </div>
+
+                {/* Animated Input when "Other" is chosen */}
+                {formData.frame === 'other' && (
+                  <div className="p-4 bg-gradient-to-r from-purple-950/60 via-[#1c1448] to-purple-950/60 border border-purple-400/40 rounded-2xl space-y-2.5 animate-fade-in shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-xs font-bold text-purple-200">
+                        Describe your natural body frame or build:
+                      </label>
+                      <span className="text-[10px] text-purple-300/70">Classical Ayurvedic Morphology</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.customFrame}
+                      onChange={(e) => setFormData({ ...formData, customFrame: e.target.value })}
+                      placeholder="e.g. Asymmetrical build, fluctuating weight, lean athletic with delicate bone structure..."
+                      className="w-full bg-[#120e36] border border-purple-400/40 rounded-xl p-3 text-xs text-white placeholder:text-violet-400/40 focus:ring-2 focus:ring-purple-400 focus:outline-none"
+                    />
+                    {/* Quick suggestion tags */}
+                    <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                      <span className="text-[10px] font-bold text-purple-300">Quick Traits:</span>
+                      {[
+                        'Fluctuating Weight (Vishama)',
+                        'Lean & Muscular (Pitta-Tikshna)',
+                        'Dense & Heavy Bone (Sthula)',
+                        'Tall & Asymmetrical (Vata-Kala)',
+                        'Petite & Delicate (Alpa-Sarira)',
+                        'Variable Joint Proportions'
+                      ].map(tag => (
+                        <button
+                          key={tag}
+                          type="button"
+                          onClick={() => setFormData(prev => ({
+                            ...prev,
+                            customFrame: prev.customFrame ? `${prev.customFrame}, ${tag}` : tag
+                          }))}
+                          className="text-[10px] px-2.5 py-1 rounded-lg bg-purple-900/50 hover:bg-purple-800/70 border border-purple-400/40 text-purple-200 hover:text-white transition font-medium"
+                        >
+                          + {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Skin & Thermal Sensitivity */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300">2. Skin &amp; Temperature Sensitivity:</label>
-                <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-2.5 pt-1">
+                <label className="block text-xs font-bold text-white">2. Skin &amp; Temperature Sensitivity:</label>
+                <div className="flex flex-wrap gap-2 p-2.5 bg-[#171342] border border-violet-400/30 rounded-2xl">
                   {[
-                    { id: 'dry', label: 'Dry, rough / Dislikes cold', tag: 'Vata' },
-                    { id: 'warm', label: 'Warm, sensitive / Dislikes heat', tag: 'Pitta' },
-                    { id: 'smooth', label: 'Thick, cool / Dislikes damp', tag: 'Kapha' }
+                    { id: 'dry', label: 'Dry, rough / Dislikes cold (Vata)', variant: 'cyan' },
+                    { id: 'warm', label: 'Warm, sensitive / Dislikes heat (Pitta)', variant: 'orange' },
+                    { id: 'smooth', label: 'Thick, cool / Dislikes damp (Kapha)', variant: 'mint' }
                   ].map(item => (
-                    <button
+                    <CyberToggle
                       key={item.id}
-                      type="button"
+                      active={formData.skin === item.id}
                       onClick={() => setFormData({ ...formData, skin: item.id })}
-                      className={`p-3 rounded-xl border text-xs text-left transition ${
-                        formData.skin === item.id
-                          ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 font-bold'
-                          : 'border-stone-200 dark:border-stone-700 hover:border-stone-400'
-                      }`}
+                      variant={item.variant}
+                      size="sm"
                     >
-                      <div className="text-[10px] uppercase text-stone-400">{item.tag}</div>
-                      <div>{item.label}</div>
-                    </button>
+                      {item.label}
+                    </CyberToggle>
                   ))}
                 </div>
               </div>
 
-              {/* Live Prakriti Preview */}
-              <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center justify-between text-xs">
-                <span className="text-amber-900 dark:text-amber-300 font-medium">Calculated Constitutional Prakriti:</span>
-                <span className="font-bold text-amber-800 dark:text-amber-200 bg-amber-200/60 dark:bg-amber-900/60 px-2.5 py-0.5 rounded-lg">
-                  {calculatePrakriti()}
-                </span>
-              </div>
+              {/* Live Tri-Dosha Prakriti Spectrum & Preview */}
+              {(() => {
+                const scores = calculatePrakritiScores();
+                return (
+                  <div className="p-4 bg-gradient-to-br from-violet-950/70 via-[#1f1854] to-purple-950/70 border border-violet-400/40 rounded-2xl space-y-3 shadow-xl">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-violet-400/20 pb-2.5">
+                      <div className="space-y-0.5">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-400">
+                          Live Constitutional Synthesis
+                        </span>
+                        <h4 className="text-xs font-bold text-white">
+                          Calculated Prakriti: <span className="text-amber-300 font-extrabold text-sm ml-1">{scores.type}</span>
+                        </h4>
+                      </div>
+                      <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 self-start sm:self-auto">
+                        Brihat Trayi Grounded
+                      </span>
+                    </div>
+
+                    {/* Tri-Dosha Spectrum Bars */}
+                    <div className="space-y-2 pt-1 text-[11px]">
+                      {/* Vata */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span className="text-cyan-300 flex items-center gap-1">
+                            <span>💨 Vata (Movement &bull; Air / Ether)</span>
+                          </span>
+                          <span className="text-cyan-300 font-mono">{scores.vPct}%</span>
+                        </div>
+                        <div className="h-2 w-full bg-[#120d36] rounded-full overflow-hidden border border-cyan-400/20">
+                          <div
+                            className="h-full bg-gradient-to-r from-cyan-500 to-cyan-300 transition-all duration-500 rounded-full"
+                            style={{ width: `${scores.vPct}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Pitta */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span className="text-orange-300 flex items-center gap-1">
+                            <span>🔥 Pitta (Metabolism &bull; Fire / Water)</span>
+                          </span>
+                          <span className="text-orange-300 font-mono">{scores.pPct}%</span>
+                        </div>
+                        <div className="h-2 w-full bg-[#120d36] rounded-full overflow-hidden border border-orange-400/20">
+                          <div
+                            className="h-full bg-gradient-to-r from-orange-500 to-amber-300 transition-all duration-500 rounded-full"
+                            style={{ width: `${scores.pPct}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Kapha */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span className="text-emerald-300 flex items-center gap-1">
+                            <span>💧 Kapha (Structure &bull; Water / Earth)</span>
+                          </span>
+                          <span className="text-emerald-300 font-mono">{scores.kPct}%</span>
+                        </div>
+                        <div className="h-2 w-full bg-[#120d36] rounded-full overflow-hidden border border-emerald-400/20">
+                          <div
+                            className="h-full bg-gradient-to-r from-emerald-500 to-emerald-300 transition-all duration-500 rounded-full"
+                            style={{ width: `${scores.kPct}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
           {/* STEP 3: Agni (Digestive Fire) */}
           {step === 3 && (
             <div className="space-y-4">
-              <div className="border-b border-stone-100 dark:border-stone-800 pb-3">
-                <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">
-                  Section 3
+              <div className="border-b border-violet-400/20 pb-3">
+                <span className="text-[10px] uppercase font-extrabold text-emerald-400 tracking-wider">
+                  Section 3 &bull; Digestive Intelligence
                 </span>
-                <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+                <h3 className="text-lg font-black text-white">
                   Agni: Your Digestive Power
                 </h3>
-                <p className="text-xs text-stone-500 mt-0.5">Which statement best reflects your stomach and digestion?</p>
+                <p className="text-xs text-violet-200/70 mt-0.5">Which statement best reflects your stomach and digestion?</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
@@ -422,15 +642,15 @@ export default function Onboarding({ onPatientCreated }) {
                     onClick={() => setFormData({ ...formData, agni: item.id })}
                     className={`p-4 rounded-2xl border text-left transition space-y-1.5 ${
                       formData.agni === item.id
-                        ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-200 shadow-sm'
-                        : 'border-stone-200 dark:border-stone-700 hover:border-stone-400'
+                        ? 'border-emerald-400 bg-emerald-950/60 text-white font-bold shadow-[0_0_15px_rgba(74,222,128,0.25)]'
+                        : 'border-violet-400/25 bg-[#171342] text-slate-300 hover:border-violet-400/50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-stone-900 dark:text-stone-100">{item.title}</span>
-                      <span className="text-[10px] font-semibold text-stone-400">{item.tag}</span>
+                      <span className="font-extrabold text-sm text-white">{item.title}</span>
+                      <span className="text-[10px] font-bold text-violet-300">{item.tag}</span>
                     </div>
-                    <p className="text-stone-600 dark:text-stone-400 text-[11px] leading-relaxed">{item.desc}</p>
+                    <p className="text-violet-200/80 text-[11px] leading-relaxed">{item.desc}</p>
                   </button>
                 ))}
               </div>
@@ -438,47 +658,48 @@ export default function Onboarding({ onPatientCreated }) {
           )}
 
           {/* STEP 4: Safety & Season */}
-          {step === 4 && (
+          {formData.gender !== 'Male' && step === 4 && (
             <div className="space-y-4">
-              <div className="border-b border-stone-100 dark:border-stone-800 pb-3">
-                <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">
-                  Section 4
+              <div className="border-b border-violet-400/20 pb-3">
+                <span className="text-[10px] uppercase font-extrabold text-orange-400 tracking-wider">
+                  Section 4 &bull; Deterministic Safety
                 </span>
-                <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+                <h3 className="text-lg font-black text-white">
                   AyurGuard Safety Screening
                 </h3>
-                <p className="text-xs text-stone-500 mt-0.5">We enforce non-negotiable medical rules to eliminate drug contraindications.</p>
+                <p className="text-xs text-violet-200/70 mt-0.5">We enforce non-negotiable medical rules to eliminate drug contraindications.</p>
               </div>
 
               {/* Pregnancy Guardrail Box */}
-              <div className="p-4 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 rounded-2xl space-y-2">
-                <span className="font-bold text-rose-900 dark:text-rose-300 text-xs flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-rose-600" />
-                  Maternal &amp; Pregnancy Protection
-                </span>
-                <label className="flex items-center space-x-2.5 text-xs text-stone-800 dark:text-stone-200 cursor-pointer pt-1">
-                  <input
-                    type="checkbox"
-                    checked={formData.isPregnant}
-                    onChange={(e) => setFormData({ ...formData, isPregnant: e.target.checked })}
-                    className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500"
-                  />
-                  <span className="font-semibold">I am currently pregnant (Garbhini Avastha)</span>
-                </label>
-                <p className="text-[11px] text-stone-500 dark:text-stone-400 pl-6">
-                  If selected, AyurGuard automatically strips and blocks all emmenagogues (e.g. Guggulu, Chitraka) and drastic purges (Virechana).
+              <div className="p-4 bg-rose-950/50 border border-rose-500/40 rounded-2xl space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <span className="font-extrabold text-rose-300 text-xs flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-rose-400" />
+                    Maternal &amp; Pregnancy Protection
+                  </span>
+                  <CyberToggle
+                    active={formData.isPregnant}
+                    onClick={() => setFormData({ ...formData, isPregnant: !formData.isPregnant })}
+                    variant="red"
+                    size="sm"
+                  >
+                    {formData.isPregnant ? 'Pregnant (Garbhini): ACTIVE' : 'Not Pregnant: CLEAR'}
+                  </CyberToggle>
+                </div>
+                <p className="text-[11px] text-violet-200/70">
+                  When active, AyurGuard automatically strips and blocks all emmenagogues (e.g. Guggulu, Chitraka) and drastic purges (Virechana).
                 </p>
               </div>
 
               {/* Season Selection */}
               <div>
-                <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
+                <label className="block text-xs font-bold text-violet-200 mb-1">
                   Current Season (Ritucharya Calibration):
                 </label>
                 <select
                   value={formData.season}
                   onChange={(e) => setFormData({ ...formData, season: e.target.value })}
-                  className="w-full border border-stone-300 dark:border-stone-700 dark:bg-stone-800 rounded-xl p-3 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  className="w-full bg-[#171342] border border-violet-400/40 rounded-xl p-3 text-xs text-white focus:ring-2 focus:ring-emerald-400 focus:outline-none"
                 >
                   <option value="Hemanta (Early Winter)">Hemanta (Early Winter - Cold, Unctuous)</option>
                   <option value="Shishira (Late Winter)">Shishira (Late Winter - Dry Cold)</option>
@@ -492,87 +713,90 @@ export default function Onboarding({ onPatientCreated }) {
           )}
 
           {/* STEP 5: Chief Complaints */}
-          {step === 5 && (
+          {(step === 5 || (formData.gender === 'Male' && step === 4)) && (
             <div className="space-y-4">
-              <div className="border-b border-stone-100 dark:border-stone-800 pb-3">
-                <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 tracking-wider">
-                  Section 5
+              <div className="border-b border-violet-400/20 pb-3">
+                <span className="text-[10px] uppercase font-extrabold text-emerald-400 tracking-wider">
+                  Section 5 &bull; Clinical Lakshanas
                 </span>
-                <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+                <h3 className="text-lg font-black text-white">
                   What Symptoms Are You Experiencing?
                 </h3>
-                <p className="text-xs text-stone-500 mt-0.5">Click any symptoms that apply to you:</p>
+                <p className="text-xs text-violet-200/70 mt-0.5">Click any symptoms that apply to you:</p>
               </div>
 
-              {/* Clickable Symptom Chips */}
-              <div className="flex flex-wrap gap-2">
+              {/* Clickable Symptom Chips with CyberToggle Reference Architecture */}
+              <div className="flex flex-wrap gap-1 p-2 bg-[#171342] border border-violet-400/30 rounded-2xl">
                 {symptomOptions.map(opt => {
                   const isSelected = formData.symptoms.includes(opt.label);
                   return (
-                    <button
+                    <CyberToggle
                       key={opt.id}
-                      type="button"
+                      active={isSelected}
                       onClick={() => handleToggleSymptom(opt.label)}
-                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition border flex items-center space-x-1.5 ${
-                        isSelected
-                          ? 'bg-emerald-800 text-amber-200 border-emerald-900 shadow-sm'
-                          : 'bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-700 hover:border-stone-400'
-                      }`}
+                      variant={isSelected ? 'mint' : 'cyan'}
+                      size="sm"
                     >
-                      {isSelected ? <Check className="w-3.5 h-3.5" /> : <span>+</span>}
-                      <span>{opt.label}</span>
-                    </button>
+                      {opt.label}
+                    </CyberToggle>
                   );
                 })}
               </div>
 
-              {/* Freeform details */}
-              <div className="pt-2">
-                <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
-                  Additional Details / How long have you felt this?
-                </label>
+              {/* Freeform details / Unlisted Symptoms */}
+              <div className="pt-2 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-violet-200">
+                    Specific Symptoms, Unlisted Condition, or Detailed Description
+                  </label>
+                  <span className="text-[10px] text-emerald-400 font-mono font-bold">
+                    AyurParam AI Synthesizer
+                  </span>
+                </div>
                 <textarea
                   rows="3"
                   value={formData.customNotes}
                   onChange={(e) => setFormData({ ...formData, customNotes: e.target.value })}
-                  placeholder="e.g. The morning stiffness takes about an hour to ease; pain is worse when it rains..."
-                  className="w-full border border-stone-300 dark:border-stone-700 dark:bg-stone-800 rounded-xl p-3 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none"
-                ></textarea>
+                  placeholder="e.g. Severe right-sided migraine with nausea and light sensitivity, shooting sciatica pain down leg, chronic eczema with scaling, kidney stone colic, tremors in hands, etc."
+                  className="w-full bg-[#171342] border border-violet-400/40 rounded-xl p-3 text-xs text-white focus:ring-2 focus:ring-emerald-400 focus:outline-none placeholder:text-violet-400/50"
+                />
+                <p className="text-[10px] text-violet-300/70">
+                  If your condition is not listed in the options above, describe it here in your own words. AyurParam will explore and synthesize the problem, match canonical Brihat Trayi evidence, and dynamically calibrate your case workspace.
+                </p>
               </div>
             </div>
           )}
 
           {/* Navigation Controls */}
-          <div className="flex items-center justify-between pt-4 border-t border-stone-100 dark:border-stone-800">
+          <div className="flex items-center justify-between pt-4 border-t border-violet-400/20">
             {step > 1 ? (
-              <button
-                type="button"
+              <ChamferButton
+                variant="ghost"
+                size="md"
                 onClick={() => setStep(step - 1)}
-                className="px-4 py-2.5 border border-stone-300 dark:border-stone-700 rounded-xl text-xs font-semibold text-stone-700 dark:text-stone-300 hover:bg-stone-100 flex items-center space-x-1.5 transition"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Previous</span>
-              </button>
-            ) : <div></div>}
+                &larr; Previous
+              </ChamferButton>
+            ) : <div />}
 
-            {step < 5 ? (
-              <button
-                type="button"
+            {step < totalSteps ? (
+              <ChamferButton
+                variant="primary"
+                size="md"
+                withArrow
                 onClick={() => setStep(step + 1)}
-                className="px-6 py-2.5 bg-emerald-800 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow transition"
               >
-                <span>Continue</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+                Continue
+              </ChamferButton>
             ) : (
-              <button
-                type="button"
+              <ChamferButton
+                variant="primary"
+                size="lg"
+                icon={Sparkles}
                 onClick={handleCompleteIntake}
-                className="px-7 py-3.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-stone-950 rounded-xl text-xs font-extrabold flex items-center space-x-2 shadow-lg transition transform hover:-translate-y-0.5"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Generate Case with AyurParam 2.9B</span>
-              </button>
+                Generate Case with AyurParam 2.9B
+              </ChamferButton>
             )}
           </div>
 

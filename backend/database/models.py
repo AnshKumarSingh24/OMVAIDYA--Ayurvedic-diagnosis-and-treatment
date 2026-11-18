@@ -39,6 +39,7 @@ class Patient(Base):
     consultations = relationship("Consultation", back_populates="patient", cascade="all, delete-orphan")
     ashtavidha_parikshas = relationship("AshtavidhaPariksha", back_populates="patient", cascade="all, delete-orphan")
     recovery_logs = relationship("RecoveryLog", back_populates="patient", cascade="all, delete-orphan")
+    cases = relationship("CaseSession", back_populates="patient", cascade="all, delete-orphan")
 
 
 class AshtavidhaPariksha(Base):
@@ -134,4 +135,78 @@ class ClassicalVerse(Base):
     formulations = Column(Text, nullable=True)     # JSON list
     contraindications = Column(Text, nullable=True)# JSON list
     keywords = Column(Text, nullable=True)
+
+
+class CaseSession(Base):
+    __tablename__ = "case_sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
+    status = Column(String(50), default="ready_for_analysis")  # intake, in_clarification, ready_for_analysis, analyzed, clinician_reviewed, safety_hold
+    chief_problem_plain_language = Column(Text, nullable=False)
+    current_step = Column(String(50), default="clarification")
+    red_flag_status = Column(String(50), default="none")  # none, warning, alert
+    red_flag_details = Column(Text, nullable=True)
+    active_analysis_id = Column(Integer, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    patient = relationship("Patient", back_populates="cases")
+    facts = relationship("CaseFact", back_populates="case", cascade="all, delete-orphan", order_by="CaseFact.created_at.asc()")
+    conversation_turns = relationship("ConversationTurn", back_populates="case", cascade="all, delete-orphan", order_by="ConversationTurn.created_at.asc()")
+    analyses = relationship("AnalysisSnapshot", back_populates="case", cascade="all, delete-orphan", order_by="AnalysisSnapshot.version.desc()")
+
+
+class CaseFact(Base):
+    __tablename__ = "case_facts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    case_id = Column(Integer, ForeignKey("case_sessions.id"), nullable=False)
+    category = Column(String(50), nullable=False)  # symptom, timing, agni, prakriti, pariksha, lifestyle, medical_history, red_flag
+    key = Column(String(100), nullable=False)
+    value = Column(Text, nullable=False)
+    normalized_value = Column(String(150), nullable=True)
+    source_type = Column(String(50), default="patient_reported")  # patient_reported, clinician_observed, imported, inferred, unknown
+    confidence = Column(Float, default=1.0)
+    confirmed_by_clinician = Column(Boolean, default=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    case = relationship("CaseSession", back_populates="facts")
+
+
+class ConversationTurn(Base):
+    __tablename__ = "conversation_turns"
+
+    id = Column(Integer, primary_key=True, index=True)
+    case_id = Column(Integer, ForeignKey("case_sessions.id"), nullable=False)
+    role = Column(String(50), nullable=False)  # assistant, patient, vaidya, system
+    message = Column(Text, nullable=False)
+    question_key = Column(String(100), nullable=True)
+    answer_payload = Column(Text, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    case = relationship("CaseSession", back_populates="conversation_turns")
+
+
+class AnalysisSnapshot(Base):
+    __tablename__ = "analysis_snapshots"
+
+    id = Column(Integer, primary_key=True, index=True)
+    case_id = Column(Integer, ForeignKey("case_sessions.id"), nullable=False)
+    version = Column(Integer, default=1)
+    input_hash = Column(String(64), nullable=True)
+    engine_status = Column(String(50), default="local_fallback")  # live_model, local_fallback, rule_based_demo
+    safety_status = Column(String(50), default="passed")          # passed, warning, safety_hold
+
+    analysis_json = Column(Text, nullable=False)
+    supersedes_id = Column(Integer, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    case = relationship("CaseSession", back_populates="analyses")
+
 

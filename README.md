@@ -4,6 +4,14 @@
 
 ---
 
+## 🌐 Live Hosted Application
+
+- **Production Cloudflare Tunnel**: **[https://gnome-submit-listings-pentium.trycloudflare.com](https://gnome-submit-listings-pentium.trycloudflare.com)** (Zero passwords, SSL encrypted, direct access)
+- **Backup Localtunnel**: **[https://chubby-views-play.loca.lt](https://chubby-views-play.loca.lt)** (Password IP: `104.28.193.171`)
+- **Local Endpoint**: `http://localhost:8000`
+
+---
+
 ## 🌿 Executive Summary
 
 **AyuVaidya** is an open-source, full-stack Clinical Decision Support System (CDSS) built specifically for qualified Vaidyas (BAMS/MD practitioners), Ayurvedic researchers, and clinical students.
@@ -113,6 +121,11 @@ Open [http://localhost:8000](http://localhost:8000)
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
+| `POST` | `/api/cases/` | Initialize persistent active case session with clinical facts |
+| `GET` | `/api/cases/patient/{patient_id}` | Fetch active case, clinical fact ledger & latest snapshot |
+| `POST` | `/api/cases/{case_id}/next-question` | Context-aware diagnostic clarifying question generator |
+| `POST` | `/api/cases/{case_id}/conversation` | Record physician clarifying turns & assert observations |
+| `POST` | `/api/cases/{case_id}/analyze` | Multi-factor differential scoring, Samprapti & versioned snapshot |
 | `GET` | `/api/patients` | List registered patients with consultation status |
 | `POST` | `/api/patients` | Register new patient with Ashtavidha Pariksha |
 | `POST` | `/api/consultations/analyze` | AyurParam (2.9B) clinical diagnostic reasoning & Samprapti |

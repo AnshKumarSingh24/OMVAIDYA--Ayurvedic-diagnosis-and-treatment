@@ -89,6 +89,32 @@ async def analyze_consultation(data: ConsultationAnalyzeIn, db: Session = Depend
     return result
 
 
+@router.get("/patient/{patient_id}/latest")
+def get_latest_patient_consultation(patient_id: int, db: Session = Depends(get_db)):
+    """Fetch most recent stored consultation for a patient."""
+    c = db.query(Consultation).filter(Consultation.patient_id == patient_id).order_by(Consultation.created_at.desc()).first()
+    if not c:
+        raise HTTPException(status_code=404, detail="No consultation found for this patient")
+
+    return {
+        "id": c.id,
+        "patient_id": c.patient_id,
+        "chief_complaints": json.loads(c.chief_complaints) if c.chief_complaints else [],
+        "duration": c.duration,
+        "triggering_nidana": c.triggering_nidana,
+        "probable_vyadhi": c.probable_vyadhi,
+        "roganirnaya_summary": c.roganirnaya_summary,
+        "samprapti_ghatakas": json.loads(c.samprapti_json) if c.samprapti_json else {},
+        "chikitsa_sutra": c.chikitsa_sutra,
+        "prescriptions": json.loads(c.formulations_json) if c.formulations_json else [],
+        "pathya": json.loads(c.pathya_json) if c.pathya_json else [],
+        "apathya": json.loads(c.apathya_json) if c.apathya_json else [],
+        "citations": json.loads(c.citations_json) if c.citations_json else [],
+        "safety_audit": json.loads(c.safety_audit_json) if c.safety_audit_json else {},
+        "created_at": c.created_at.isoformat() if c.created_at else None
+    }
+
+
 @router.get("/{consultation_id}")
 def get_consultation(consultation_id: int, db: Session = Depends(get_db)):
     """Fetch stored clinical consultation by ID."""

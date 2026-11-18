@@ -22,6 +22,7 @@ class RecoveryLogIn(BaseModel):
 
 
 @router.get("/{patient_id}")
+@router.get("/patient/{patient_id}")
 def get_patient_recovery_history(patient_id: int, db: Session = Depends(get_db)):
     """
     Returns time-series logs for Recharts visualization of clinical progress.
@@ -52,6 +53,8 @@ def get_patient_recovery_history(patient_id: int, db: Session = Depends(get_db))
 
 
 @router.post("/{patient_id}")
+@router.post("/patient/{patient_id}")
+@router.post("/patient/{patient_id}/log")
 def add_recovery_log(patient_id: int, data: RecoveryLogIn, db: Session = Depends(get_db)):
     """
     Records a follow-up consultation recovery assessment.

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Share2, ZoomIn, ZoomOut, RefreshCw } from 'lucide-react';
+import CyberToggle from './CyberToggle';
 
 export default function GraphVisualizer({ graphData, onSelectNode }) {
   const [selectedNode, setSelectedNode] = useState(null);
@@ -7,7 +8,7 @@ export default function GraphVisualizer({ graphData, onSelectNode }) {
 
   if (!graphData || !graphData.nodes || graphData.nodes.length === 0) {
     return (
-      <div className="p-8 text-center bg-stone-50 dark:bg-stone-800/40 rounded-2xl border border-stone-200 dark:border-stone-700 text-stone-500">
+      <div className="p-8 text-center bg-[var(--gb-surface)] rounded-2xl border border-[var(--gb-border)] text-[var(--gb-dim)] text-xs">
         No graph network data loaded.
       </div>
     );
@@ -20,30 +21,39 @@ export default function GraphVisualizer({ graphData, onSelectNode }) {
   const nodeTypes = ['ALL', ...new Set(graphData.nodes.map(n => n.type))];
 
   return (
-    <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-5 shadow-sm space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-100 dark:border-stone-800 pb-3">
+    <div className="bg-[var(--gb-surface)] border border-[var(--gb-border)] rounded-2xl p-5 shadow-[var(--gb-shadow)] space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--gb-border)]/60 pb-3">
         <div className="flex items-center space-x-2">
-          <Share2 className="w-4 h-4 text-emerald-600" />
-          <h3 className="font-bold text-sm uppercase tracking-wider text-stone-800 dark:text-stone-200">
+          <Share2 className="w-4 h-4 text-[var(--gb-mint)]" />
+          <h3 className="font-bold text-xs uppercase tracking-wider text-[var(--gb-white)]">
             Ayurvedic Knowledge Graph Explorer ({graphData.total_nodes || nodes.length} Nodes &bull; {graphData.total_edges || graphData.links?.length} Edges)
           </h3>
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 text-xs">
-          {nodeTypes.map(t => (
-            <button
-              key={t}
-              onClick={() => setFilterType(t)}
-              className={`px-2.5 py-1 rounded-lg font-medium transition ${
-                filterType === t
-                  ? 'bg-emerald-800 text-amber-200 shadow-sm'
-                  : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200'
-              }`}
-            >
-              {t}
-            </button>
-          ))}
+        {/* Filter Pills with CyberToggle Architecture */}
+        <div className="flex flex-wrap items-center gap-1 p-1 bg-[var(--gb-surface-raised)] border border-[var(--gb-border)] rounded-2xl">
+          {nodeTypes.map((t, idx) => {
+            const variantMap = {
+              ALL: 'mint',
+              disease: 'red',
+              dosha: 'orange',
+              dhatu: 'cyan',
+              srotas: 'violet',
+              herb: 'mint'
+            };
+            const variant = variantMap[t.toLowerCase()] || variantMap[t] || ['mint', 'cyan', 'orange', 'red', 'violet'][idx % 5];
+            return (
+              <CyberToggle
+                key={t}
+                active={filterType === t}
+                onClick={() => setFilterType(t)}
+                variant={variant}
+                size="sm"
+              >
+                {t}
+              </CyberToggle>
+            );
+          })}
         </div>
       </div>
 
@@ -58,20 +68,20 @@ export default function GraphVisualizer({ graphData, onSelectNode }) {
             }}
             className={`p-2.5 rounded-xl border text-xs cursor-pointer transition flex flex-col justify-between ${
               selectedNode?.id === node.id
-                ? 'ring-2 ring-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-400'
-                : 'bg-stone-50 dark:bg-stone-800/60 border-stone-200 dark:border-stone-700 hover:border-stone-400'
+                ? 'ring-2 ring-[var(--gb-mint)] bg-[var(--gb-purple-dark)] border-[var(--gb-mint)]'
+                : 'bg-[var(--gb-surface-raised)]/70 hover:bg-[var(--gb-surface-raised)] border-[var(--gb-border)]'
             }`}
           >
             <div className="flex items-center justify-between">
               <span
-                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ backgroundColor: node.color || '#10b981' }}
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ backgroundColor: node.color || '#4ade80' }}
               ></span>
-              <span className="text-[10px] uppercase font-bold text-stone-400">
+              <span className="text-[9px] uppercase font-bold text-[var(--gb-dim)]">
                 {node.type}
               </span>
             </div>
-            <div className="font-semibold text-stone-900 dark:text-stone-100 truncate mt-1.5" title={node.label}>
+            <div className="font-semibold text-[var(--gb-white)] truncate mt-1.5 text-[11px]" title={node.label}>
               {node.label}
             </div>
           </div>
@@ -80,14 +90,14 @@ export default function GraphVisualizer({ graphData, onSelectNode }) {
 
       {/* Node Inspection Detail Bar */}
       {selectedNode && (
-        <div className="p-3 bg-stone-100 dark:bg-stone-800/80 rounded-xl border border-stone-200 dark:border-stone-700 text-xs flex flex-wrap items-center justify-between gap-2">
+        <div className="p-3 bg-[var(--gb-purple-dark)]/80 rounded-xl border border-[var(--gb-border-strong)] text-xs flex flex-wrap items-center justify-between gap-2">
           <div>
-            <span className="font-bold text-stone-900 dark:text-stone-100">{selectedNode.label}</span>
-            <span className="text-stone-500 dark:text-stone-400 ml-2">Type: {selectedNode.type}</span>
+            <span className="font-bold text-[var(--gb-white)]">{selectedNode.label}</span>
+            <span className="text-[var(--gb-dim)] ml-2">Type: <span className="text-[var(--gb-mint)] font-mono">{selectedNode.type}</span></span>
           </div>
           <button
             onClick={() => setSelectedNode(null)}
-            className="text-stone-400 hover:text-stone-600 text-xs font-semibold"
+            className="text-[var(--gb-dim)] hover:text-[var(--gb-white)] text-xs font-semibold"
           >
             Clear Selection
           </button>
@@ -96,4 +106,3 @@ export default function GraphVisualizer({ graphData, onSelectNode }) {
     </div>
   );
 }
-

@@ -16,53 +16,53 @@ export default function SampraptiFlow({ ghatakas, kriyaKala }) {
   return (
     <div className="space-y-6">
       {/* Samprapti Ghatakas Matrix */}
-      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm space-y-4">
-        <div className="flex items-center space-x-2 border-b border-stone-100 dark:border-stone-800 pb-3">
-          <GitBranch className="w-4 h-4 text-emerald-600" />
-          <h3 className="font-bold text-sm uppercase tracking-wider text-stone-800 dark:text-stone-200">
+      <div className="bg-[#20194f] border border-violet-400/30 rounded-2xl p-6 shadow-xl space-y-4">
+        <div className="flex items-center space-x-2 border-b border-violet-400/20 pb-3">
+          <GitBranch className="w-4 h-4 text-emerald-400" />
+          <h3 className="font-extrabold text-sm uppercase tracking-wider text-white">
             Samprapti Ghatakas (Pathology Components)
           </h3>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-          <div className="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700">
-            <span className="block text-[10px] uppercase font-bold text-stone-400">Aggravated Doshas</span>
-            <span className="font-semibold text-stone-900 dark:text-stone-100 mt-1 block">
+          <div className="p-3.5 bg-[#171342] rounded-xl border border-violet-400/25">
+            <span className="block text-[10px] uppercase font-bold text-violet-300/70">Aggravated Doshas</span>
+            <span className="font-bold text-amber-300 mt-1 block">
               {Array.isArray(ghatakas.dosha) ? ghatakas.dosha.join(', ') : ghatakas.dosha}
             </span>
           </div>
 
-          <div className="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700">
-            <span className="block text-[10px] uppercase font-bold text-stone-400">Vitiated Dhatus</span>
-            <span className="font-semibold text-stone-900 dark:text-stone-100 mt-1 block">
+          <div className="p-3.5 bg-[#171342] rounded-xl border border-violet-400/25">
+            <span className="block text-[10px] uppercase font-bold text-violet-300/70">Vitiated Dhatus</span>
+            <span className="font-bold text-emerald-300 mt-1 block">
               {Array.isArray(ghatakas.dushya) ? ghatakas.dushya.join(', ') : ghatakas.dushya}
             </span>
           </div>
 
-          <div className="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700">
-            <span className="block text-[10px] uppercase font-bold text-stone-400">Agni &amp; Ama Status</span>
-            <span className="font-semibold text-stone-900 dark:text-stone-100 mt-1 block">
+          <div className="p-3.5 bg-[#171342] rounded-xl border border-violet-400/25">
+            <span className="block text-[10px] uppercase font-bold text-violet-300/70">Agni &amp; Ama Status</span>
+            <span className="font-bold text-white mt-1 block">
               {ghatakas.agni} {ghatakas.ama ? '(Ama Present)' : '(Nirama)'}
             </span>
           </div>
 
-          <div className="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700">
-            <span className="block text-[10px] uppercase font-bold text-stone-400">Affected Srotas</span>
-            <span className="font-semibold text-stone-900 dark:text-stone-100 mt-1 block">
+          <div className="p-3.5 bg-[#171342] rounded-xl border border-violet-400/25">
+            <span className="block text-[10px] uppercase font-bold text-violet-300/70">Affected Srotas</span>
+            <span className="font-bold text-sky-300 mt-1 block">
               {Array.isArray(ghatakas.srotas) ? ghatakas.srotas.join(', ') : ghatakas.srotas}
             </span>
           </div>
 
-          <div className="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700 md:col-span-2">
-            <span className="block text-[10px] uppercase font-bold text-stone-400">Sroto-Dushti Prakara</span>
-            <span className="font-semibold text-stone-900 dark:text-stone-100 mt-1 block">
+          <div className="p-3.5 bg-[#171342] rounded-xl border border-violet-400/25 md:col-span-2">
+            <span className="block text-[10px] uppercase font-bold text-violet-300/70">Sroto-Dushti Prakara</span>
+            <span className="font-bold text-white mt-1 block">
               {ghatakas.sroto_dushti_prakara}
             </span>
           </div>
 
-          <div className="p-3 bg-stone-50 dark:bg-stone-800/50 rounded-xl border border-stone-200 dark:border-stone-700 md:col-span-2">
-            <span className="block text-[10px] uppercase font-bold text-stone-400">Adhisthana (Primary Site)</span>
-            <span className="font-semibold text-stone-900 dark:text-stone-100 mt-1 block">
+          <div className="p-3.5 bg-[#171342] rounded-xl border border-violet-400/25 md:col-span-2">
+            <span className="block text-[10px] uppercase font-bold text-violet-300/70">Adhisthana (Primary Site)</span>
+            <span className="font-bold text-white mt-1 block">
               {ghatakas.adhisthana}
             </span>
           </div>
@@ -71,32 +71,32 @@ export default function SampraptiFlow({ ghatakas, kriyaKala }) {
 
       {/* Shat Kriya Kala 6-Stage Timeline */}
       {kriyaKala && (
-        <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-3">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-stone-800 dark:text-stone-200">
+        <div className="bg-[#20194f] border border-violet-400/30 rounded-2xl p-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between border-b border-violet-400/20 pb-3">
+            <h3 className="font-extrabold text-sm uppercase tracking-wider text-white">
               Shat Kriya Kala Progression (Sushruta Samhita Sutra 21)
             </h3>
-            <span className="text-[11px] text-stone-400">6 Stages of Pathogenesis</span>
+            <span className="text-[11px] text-violet-300 font-semibold">6 Stages of Pathogenesis</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {stages.map((st, idx) => (
               <div
                 key={st.key}
-                className="p-4 bg-stone-50 dark:bg-stone-800/40 rounded-xl border border-stone-200 dark:border-stone-700 space-y-2 relative"
+                className="p-4 bg-[#171342] rounded-xl border border-violet-400/25 space-y-2 relative shadow-md"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs text-emerald-800 dark:text-emerald-400">
+                  <span className="font-black text-xs text-emerald-400">
                     {st.title}
                   </span>
-                  <span className="text-[10px] font-mono bg-stone-200 dark:bg-stone-700 px-1.5 py-0.5 rounded text-stone-600 dark:text-stone-300">
+                  <span className="text-[10px] font-mono bg-violet-950 text-violet-300 px-2 py-0.5 rounded border border-violet-400/30">
                     Phase {idx + 1}
                   </span>
                 </div>
-                <div className="text-[11px] font-semibold text-stone-500 dark:text-stone-400">
+                <div className="text-[11px] font-bold text-violet-300">
                   {st.subtitle}
                 </div>
-                <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed pt-1">
+                <p className="text-xs text-slate-200 leading-relaxed pt-1">
                   {kriyaKala[st.key] || 'Progressive pathological evolution.'}
                 </p>
               </div>
@@ -107,4 +107,3 @@ export default function SampraptiFlow({ ghatakas, kriyaKala }) {
     </div>
   );
 }
-
