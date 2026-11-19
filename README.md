@@ -6,10 +6,7 @@
 
 ## 🌐 Live Hosted Application
 
-- **Production Cloudflare Tunnel**: **[https://gnome-submit-listings-pentium.trycloudflare.com](https://gnome-submit-listings-pentium.trycloudflare.com)** (Zero passwords, SSL encrypted, direct access)
-- **Backup Localtunnel**: **[https://chubby-views-play.loca.lt](https://chubby-views-play.loca.lt)** (Password IP: `104.28.193.171`)
-- **Local Endpoint**: `http://localhost:8000`
-
+Run the project on vs code agent by telling it to run the project as one starting from the landing page
 ---
 
 ## 🌿 Executive Summary
