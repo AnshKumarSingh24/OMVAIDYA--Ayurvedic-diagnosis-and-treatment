@@ -121,7 +121,8 @@ export default function ActiveCase({ activePatientId, patients = [], onSelectPat
       setAnalysisError(null);
 
       if (data && data.id) {
-        loadNextQuestion(data.id);
+        // Await so callers can rely on nextQuestion being set after loadCase resolves
+        await loadNextQuestion(data.id);
       }
       // If we got a valid case, sync the global active patient
       if (data?.patient?.id && onSelectPatient) {

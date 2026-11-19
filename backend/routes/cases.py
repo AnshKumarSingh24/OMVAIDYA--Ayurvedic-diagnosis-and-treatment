@@ -827,6 +827,43 @@ def get_next_clarifying_question(case_id: int, db: Session = Depends(get_db)):
                 "allow_custom": True
             }
 
+    # Rule 10.5: Hyperactive Metabolism / Inability to Gain Weight (Karshya / Atyagni / Bhasmaka)
+    if any(w in all_facts_text for w in [
+        "metabolism", "fast metabolism", "hyperactive metabolism", "unable to gain weight",
+        "cannot gain weight", "not gaining weight", "weight", "underweight", "thin", "skinny",
+        "karshya", "atyagni", "bhasmaka", "eat a lot", "always hungry", "ravenous",
+        "emaciat", "dhatukshaya", "dhatu kshaya"
+    ]):
+        if "atyagni_hunger_pattern" not in known_keys:
+            return {
+                "has_next": True,
+                "question_key": "atyagni_hunger_pattern",
+                "category": "symptom",
+                "question_text": "Do you feel intense hunger again within 1-2 hours after a full meal, and despite eating well, find it very difficult or impossible to gain body weight?",
+                "clinical_rationale": "In Charaka Chikitsa 15/217-219, rapid return of hunger after a full meal combined with inability to gain weight is the hallmark of Atyagni (Bhasmaka Roga) — a hyperactive Jatharagni state where food is consumed by the digestive fire before it can nourish the Dhatus.",
+                "options": [
+                    "Yes, hungry again within 1-2 hours of eating and weight stays the same despite high intake",
+                    "Appetite is normal, but metabolism just feels fast",
+                    "No excessive hunger, but weight does not increase at all"
+                ],
+                "allow_custom": True
+            }
+
+        if "atyagni_body_signs" not in known_keys:
+            return {
+                "has_next": True,
+                "question_key": "atyagni_body_signs",
+                "category": "symptom",
+                "question_text": "Is the difficulty in gaining weight accompanied by dryness, prominent joints and veins, reduced stamina, or restlessness — signs of Dhatu depletion (Dhatukshaya)?",
+                "clinical_rationale": "In Charaka Sutra 21/11-20, prominent body frame, Rasa-Mamsa-Meda Dhatu depletion, Ojakshaya (immune fragility), and hyperactive Vata-Pitta confirm Karshya / Atyagni pattern rather than a simple constitutional thin build.",
+                "options": [
+                    "Yes, prominent joints, dry skin, restlessness, easy fatigue and low stamina",
+                    "Thin but energy is good and no dryness noticed",
+                    "Thin with feeling of excessive heat, burning sensation and irritability"
+                ],
+                "allow_custom": True
+            }
+
     # Rule 11: General Undifferentiated / Unlisted Lakshana Inquiry (Prashna Pariksha)
     if "problem_location_character" not in known_keys:
         return {

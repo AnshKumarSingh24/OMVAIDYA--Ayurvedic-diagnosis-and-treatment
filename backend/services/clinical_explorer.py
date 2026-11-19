@@ -73,6 +73,46 @@ class ClinicalIntelligenceExplorer:
                 "classical_verse_anchor": "Charaka Samhita Vimana Sthana 8/83"
             }
 
+        # 0.5: Karshya / Atyagni — Hyperactive Metabolism & Inability to Gain Weight
+        if any(w in text_corpus for w in [
+            "metabolism", "fast metabolism", "hyperactive metabolism", "unable to gain weight",
+            "cannot gain weight", "not gaining weight", "weight", "underweight", "thin", "skinny",
+            "karshya", "atyagni", "bhasmaka", "eat a lot", "always hungry", "emaciat"
+        ]):
+            return {
+                "clinical_domain": "Agni-Sharir Chikitsa & Santarpana (Brimhana / Anabolic Restoration Therapy)",
+                "identified_condition_core": "Karshya & Atyagni / Bhasmaka Roga (Hypermetabolic Dhatukshaya — Inability to Gain Weight)",
+                "etiological_trigger": "Tikshna Jatharagni (excessively sharp digestive fire) driven by Vata-Pitta Prakriti, chronic mental stress, irregular meal timing, or genetic constitutional predisposition that burns food before it can nourish the Dhatus.",
+                "pathophysiological_rationale": (
+                    "In Charaka Chikitsa 15/217-219, Atyagni (Bhasmaka Agni) describes a pathological state where Samana Vata over-kindles Jatharagni, causing food to be digested and absorbed "
+                    "with abnormal rapidity. The ingested nutrients are metabolized so quickly that the Rasa Dhatu (nutritional plasma) has insufficient dwell-time for sequential "
+                    "Dhatu-Paka (seven-fold tissue transformation). The result is progressive depletion of Rasa → Mamsa → Meda → Asthi → Ojas, manifesting as constitutional thinness, "
+                    "inability to gain body weight despite high caloric intake, frequent intense hunger, dry skin, prominent joints, and reduced stamina. "
+                    "Charaka Sutra 21/11-20 defines Karshya (Atikrisha) as a Nindita condition caused by excessive exercise, stress, grief, and sleep loss that depletes Dhatus via Vata aggravation."
+                ),
+                "distinguishing_pearls": [
+                    "Classical Differentiation: Distinguish Atyagni (voracious appetite + cannot gain weight) from Sthaulya (Mandagni: low appetite + excessive weight gain). The therapeutic approach is OPPOSITE.",
+                    "Therapeutic Mandate: Never prescribe Langhana (fasting) or Deepana (digestive stimulants) in Karshya/Atyagni — this will further aggravate the condition. Prescribe Santarpana / Brimhana (anabolic therapy): ghee, milk, nourishing heavy diet.",
+                    "Classical Treatment Sutra: 'Tasmaat Tikshnaagnaye dadyaat annapanam guru snigdham' — For hyperactive Jatharagni, prescribe heavy, unctuous, and cooling foods (Charaka Chikitsa 15/217-219).",
+                    "Rasayana Mandate: Ashwagandha + Shatavari + Draksharishta form the core Rasayana triad for Karshya — to anchor Dhatu nourishment and reduce Vata-Pitta hyperactivity."
+                ],
+                "recommended_regimen": {
+                    "primary_formulation": "Ashwagandhadi Lehyam (5-10g with warm milk twice daily) + Shatavari Ghritham (5ml with warm milk before meals)",
+                    "external_therapy": "Daily Abhyanga (oil massage) with warm Bala or Sesame oil for 10-15 minutes before bathing to reduce Vata and anchor Mamsa",
+                    "pathya": [
+                        "Warm A2 cow's milk with 2 tsp ghee and Ashwagandha twice daily",
+                        "High-caloric anabolic diet: Urad dal khichdi with ghee, soaked almonds, dates, figs",
+                        "Eat consistently every 3 hours — never allow hunger to return fully before next meal"
+                    ],
+                    "apathya": [
+                        "Fasting or skipping meals (contraindicated in Atyagni)",
+                        "Pungent, dry, bitter astringent foods that further sharpen Agni",
+                        "Excessive aerobic cardio without caloric surplus"
+                    ]
+                },
+                "classical_verse_anchor": "Charaka Samhita Chikitsa Sthana 15/217-219 & Charaka Samhita Sutra Sthana 21/11-20"
+            }
+
         # 1. Musculoskeletal & Sports Overexertion (e.g. Cricket, Running, Muscle Strain, Thigh/Leg Pain)
         if any(w in text_corpus for w in ["thigh", "cricket", "sports", "running", "muscle", "strain", "cramp", "soreness", "after playing", "overexertion", "leg pain", "calf", "uru", "mamsa"]):
             return {

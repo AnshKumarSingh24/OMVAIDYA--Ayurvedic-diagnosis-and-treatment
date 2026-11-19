@@ -344,6 +344,14 @@ class SampraptiModelingService:
                 "hallmarks": [],
                 "distinguishing_positives": [],
                 "distinguishing_negatives": []
+            },
+            "Karshya": {
+                "name": "Karshya & Atyagni / Bhasmaka Roga (Hypermetabolic Dhatukshaya & Inability to Gain Weight)",
+                "disease_key": "Karshya",
+                "score": 0,
+                "hallmarks": [],
+                "distinguishing_positives": [],
+                "distinguishing_negatives": []
             }
         }
 
@@ -504,6 +512,27 @@ class SampraptiModelingService:
         if any(w in text_corpus for w in ["fever", "chills", "high temperature", "jwara", "shivering", "feverish"]):
             candidates["Jwara"]["score"] += 5
             candidates["Jwara"]["hallmarks"].append("Santapa (elevated body temperature) and Swedavaha Srotorodha")
+
+        # 26. Hypermetabolism / Inability to Gain Weight (Karshya / Atyagni / Bhasmaka)
+        has_karshya = any(w in text_corpus for w in [
+            "metabolism", "fast metabolism", "hyperactive metabolism", "cannot gain weight",
+            "unable to gain weight", "unable to put on weight", "not gaining weight",
+            "weight", "underweight", "thin", "skinny", "karshya", "atyagni", "bhasmaka",
+            "eat a lot", "eat so much", "hungry all the time", "always hungry",
+            "ravenous", "emaciat", "atiagni", "dhatu kshaya", "dhatukshaya"
+        ])
+        if has_karshya:
+            candidates["Karshya"]["score"] += 6
+            candidates["Karshya"]["hallmarks"].append("Hypermetabolic Atyagni / Bhasmaka — food consumed rapidly without Dhatu nourishment (Dhatukshaya)")
+            if any(w in text_corpus for w in ["metabolism", "fast metabolism", "hyperactive metabolism"]):
+                candidates["Karshya"]["score"] += 3
+                candidates["Karshya"]["distinguishing_positives"].append("Explicit self-reporting of fast or hyperactive metabolism (Tikshna Jatharagni) with inability to gain weight is pathognomonic of Atyagni / Bhasmaka Roga")
+            if any(w in text_corpus for w in ["weight", "gain weight", "unable to gain", "cannot gain"]):
+                candidates["Karshya"]["score"] += 2
+                candidates["Karshya"]["distinguishing_positives"].append("Inability to gain weight despite adequate intake indicates Dhatu-Paka Vikruti (tissue-nourishment failure)")
+            if any(w in text_corpus for w in ["always hungry", "ravenous", "eat a lot", "eat so much"]):
+                candidates["Karshya"]["score"] += 2
+                candidates["Karshya"]["distinguishing_positives"].append("Excessive appetite (Bhasmaka) despite emaciation confirms Tikshna Agni / Vata-Pitta hyperactivity")
 
         # ------------------------------------------------------------------
         # RAG SEMANTIC GROUNDING BOOST
@@ -1137,6 +1166,38 @@ class SampraptiModelingService:
             apathya = ["Heavy meals, dairy, curd", "Cold water bath", "Day sleep", "Physical exertion"]
             recommended_formulations = ["Sudarshana Churna"]
 
+        elif disease_key == "Karshya":
+            vyadhi = "Karshya & Atyagni / Bhasmaka Roga (Hypermetabolic Dhatukshaya — Inability to Gain Weight)"
+            dosha_list = ["Samana Vata", "Pachaka Pitta (Tikshna Agni)", "Vyana Vata"]
+            dushya_list = ["Rasa Dhatu", "Mamsa Dhatu", "Meda Dhatu", "Shukra / Ojas"]
+            srotas_list = ["Rasavaha Srotas", "Mamsavaha Srotas", "Annavahasrotas"]
+            sroto_dushti = "Atipravritti (Hyperactive over-processing of ingested food — Dhatu Paka Vikruti)"
+            adhisthana = "Amashaya (Jatharagni Seat) & Sarva Dhatu Vaha"
+            ama_present = False
+            kriya_kala = {
+                "1_sanchaya": "Excessive Tikshna (sharp) and Teekshna Agni accumulates due to genetic constitution, Vata-Pitta Prakriti, or chronic stress / irregular eating habits.",
+                "2_prakopa": "Samana Vata fans the digestive fire (Jatharagni) excessively, triggering Atyagni (Bhasmaka Agni — a voraciously burning hypermetabolic state).",
+                "3_prasara": "Food is digested and absorbed abnormally rapidly through Rasavaha and Annavahasrotas without adequate Stambhana (consolidation) for Dhatu nourishment.",
+                "4_sthana_samshraya": "Dhatus (especially Rasa, Mamsa, Meda) are perpetually depleted faster than they can be built, causing progressive Dhatukshaya (tissue loss).",
+                "5_vyakti": "Manifests as constitutional inability to gain weight, rapid hunger return despite adequate intake, prominent body-frame thinness, reduced stamina, and dryness.",
+                "6_bheda": "Chronic Karshya leads to Ojakshaya (immune depletion), reproductive weakness, fatigue, and neurological fragility if Brimhana therapy is not initiated."
+            }
+            chikitsa_sutra = "Santarpana Chikitsa (Brimhana Therapy), Snigdha-Guru-Madura Ahara, Ashwagandhadi Rasayana, and Medicated Ghee Protocols (Charaka Sutra 21/11-20 & Charaka Chikitsa 15/217-219)."
+            pathya = [
+                "Warm A2 cow's milk with 2 tsp cow's ghee and a pinch of Ashwagandha and cardamom twice daily",
+                "High-caloric anabolic diet: Urad dal khichdi with ghee, soaked almonds, dates, figs and banana",
+                "Nourishing warm root vegetables: Yam (Surana), Sweet potato and cooked Taro with rock salt and ghee",
+                "Avoid skipping meals; eat at consistent intervals every 3 hours to prevent Jatharagni over-kindles",
+                "Oil massage (Abhyanga) with warm Sesame or Bala taila daily before bathing to anchor Vata and build Mamsa"
+            ]
+            apathya = [
+                "Fasting, skipping meals, or intermittent fasting — contraindicated in Atyagni / Karshya",
+                "Pungent, dry, bitter, and astringent foods that further sharpen Agni (raw salads, spicy curries, roasted snacks)",
+                "Excessive aerobic cardio exercise (jogging, cycling) without adequate caloric surplus",
+                "Caffeine, energy drinks, and excessive screen time / mental stress aggravate Vata-Pitta"
+            ]
+            recommended_formulations = ["Ashwagandhadi Lehyam", "Shatavari Ghritham", "Draksharishta"]
+
         else:
             # Fallback if clinical features remain undifferentiated or incomplete
             vyadhi = "Asiddha Roganirnaya — Lakshana Clarification Needed (Undifferentiated Clinical Presentation)"
@@ -1169,7 +1230,7 @@ class SampraptiModelingService:
             recommended_formulations = ["Sudarshana Churna"]
 
         # Tracing in knowledge graph
-        graph_key = disease_key if disease_key in ["Amavata", "Sandhigata Vata", "Amlapitta", "Grahani Dosha", "Prameha", "Jwara"] else "Vatavyadhi"
+        graph_key = disease_key if disease_key in ["Amavata", "Sandhigata Vata", "Amlapitta", "Grahani Dosha", "Prameha", "Jwara", "Karshya"] else "Vatavyadhi"
         graph_data = self.kg.trace_samprapti(graph_key)
 
         return {

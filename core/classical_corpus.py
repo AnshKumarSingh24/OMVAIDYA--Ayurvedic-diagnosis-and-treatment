@@ -388,6 +388,40 @@ CANONICAL_SHLOKAS: List[Dict[str, Any]] = [
         "contraindications": ["Premature diagnostic assumptions without thorough inquiry"],
         "anupana_rules": ["Ushnodaka (Warm water)"],
         "keywords": ["pariksha", "inquiry", "roganirnaya", "yukti", "investigation"]
+    },
+    {
+        "shloka_id": "CS_SUT_21_011",
+        "treatise": "Charaka Samhita",
+        "sthana": "Sutra Sthana",
+        "adhyaya": "Ashtau Ninditiya Adhyaya (Chapter 21)",
+        "shloka_number": "11-20",
+        "sanskrit_devanagari": "व्यायामोऽतिव्यवायश्च शोकश्चिन्ता प्रजागरः। वातप्रकोपजा रोगाः कृशस्योपद्रवाः स्मृताः॥ कृशानां बृंहणार्थं च लघु सन्तर्पणं च यत्।",
+        "sanskrit_iast": "vyāyāmo'tivyavāyaśca śokaścintā prajāgaraḥ | vātaprakopajā rogāḥ kṛśasyopadravāḥ smṛtāḥ || kṛśānāṁ bṛṁhaṇārthaṁ ca laghu santarpaṇaṁ ca yat ||",
+        "english_translation": "Excessive physical overexertion, stress, excessive worrying, and sleep loss aggravate Vata and deplete body tissues, causing Karshya (inability to gain weight / emaciation). For emaciated patients, Brimhana (anabolic nourishing therapy) with easily assimilable nourishing diet and Ashwagandha-Rasayana is paramount.",
+        "hindi_translation": "अत्यधिक व्यायाम, चिंता, शोक और रात्रि जागरण से वात प्रकुपित होकर धातुओं का क्षय करता है जिससे कार्श्य (वजन न बढ़ना) होता है। कृश व्यक्तियों के लिए लघु-सन्तर्पण व बृंहण चिकित्सा श्रेष्ठ है।",
+        "dosha_association": ["Vata", "Pitta"],
+        "indications": ["Karshya", "Atikrisha", "Fast Metabolism", "Underweight", "Unable to gain weight", "Emaciation", "Dhatukshaya"],
+        "formulations": ["Ashwagandhadi Lehyam", "Shatavari Ghritham", "Draksharishta"],
+        "contraindications": ["Fasting (Langhana)", "Dry cold food", "Excessive cardio overexertion", "Late nights"],
+        "anupana_rules": ["Warm milk with ghee", "Warm water"],
+        "keywords": ["karshya", "metabolism", "weight gain", "underweight", "fast metabolism", "ashwagandha", "brimhana"]
+    },
+    {
+        "shloka_id": "CS_CHI_15_217",
+        "treatise": "Charaka Samhita",
+        "sthana": "Chikitsa Sthana",
+        "adhyaya": "Grahani Dosha Chikitsa (Chapter 15)",
+        "shloka_number": "217-219",
+        "sanskrit_devanagari": "नृणां सन्दीप्यते तीक्ष्णो वायुनोदीरितोऽनलः। भुक्तं भुक्तं नरः शीघ्रमन्नं पचति दीप्तराट्॥ तस्मात् तीक्ष्णाग्नये दद्यादन्नपानं गुरु स्निग्धं च शीतलम्।",
+        "sanskrit_iast": "nṛṇāṁ sandīpyate tīkṣṇo vāyunodīrito'nalaḥ | bhuktaṁ bhuktaṁ naraḥ śīghramannaṁ pacati dīptarāṭ || tasmāt tīkṣṇāgnaye dadyādannapānaṁ guru snigdhaṁ ca śītalam ||",
+        "english_translation": "When Samana Vata combined with Tikshna Pitta over-kindles Jatharagni, ingested food is burned through with abnormal rapidity (Atyagni / Hypermetabolism / Bhasmaka). To nourish the depleted Dhatus, heavy, unctuous, cooling and nourishing diet with medicated ghee is prescribed.",
+        "hindi_translation": "जब वायु द्वारा उद्दीप्त होकर तीक्ष्ण अग्नि भोजन को अतिशीघ्र पचा देती है, तब अत्याग्नि/भस्मक रोग होता है। इसमें गुरु, स्निग्ध एवं शीतल आहार तथा घृत का सेवन कराना चाहिए।",
+        "dosha_association": ["Pitta", "Vata"],
+        "indications": ["Atyagni", "Bhasmaka Roga", "Hyperactive Metabolism", "Voracious Hunger", "Tikshnagni", "Rapid Digestion"],
+        "formulations": ["Shatavari Ghritham", "Ashwagandhadi Lehyam", "Mahakalyanaka Ghrita"],
+        "contraindications": ["Pungent, dry, hot and sour foods", "Skipping meals"],
+        "anupana_rules": ["Warm milk", "Ghee"],
+        "keywords": ["atyagni", "bhasmaka", "hypermetabolism", "fast metabolism", "ravenous hunger", "shatavari"]
     }
 ]
 
@@ -569,6 +603,28 @@ FORMULATION_SAFETY_CATALOG: Dict[str, Dict[str, Any]] = {
         "pediatric_safe": True,
         "pregnancy_safe": False,
         "shloka_ref": "CS_SU_21_035"
+    },
+    "Ashwagandhadi Lehyam": {
+        "ingredients": ["Ashwagandha", "Sariva", "Shweta Jiraka", "Madhusnuhi", "Draksha", "Ghrita", "Sharkara"],
+        "indications": ["Karshya", "Underweight", "Unable to gain weight", "Dhatukshaya", "Exhaustion", "Low stamina"],
+        "standard_dosage": "5-10 grams twice daily with warm milk",
+        "approved_anupana": ["Warm cow's milk", "Warm water"],
+        "disallowed_anupana": ["Cold water", "Alcohol"],
+        "contraindications": ["Severe active metabolic toxin accumulation (Sama Avastha)", "Uncontrolled acute fever"],
+        "pediatric_safe": True,
+        "pregnancy_safe": True,
+        "shloka_ref": "CS_SUT_21_011"
+    },
+    "Shatavari Ghritham": {
+        "ingredients": ["Shatavari Svarasa", "Go-Ghrita", "Kshira (Cow's Milk)", "Sharkara", "Pippali"],
+        "indications": ["Atyagni", "Bhasmaka Roga", "Hyperactive Metabolism", "Tikshnagni", "Emaciation"],
+        "standard_dosage": "5-10 ml twice daily with warm milk before meals",
+        "approved_anupana": ["Warm cow's milk", "Warm water"],
+        "disallowed_anupana": ["Chilled drinks", "Sour juices"],
+        "contraindications": ["High Kapha congestion", "Severe chronic diarrhea"],
+        "pediatric_safe": True,
+        "pregnancy_safe": True,
+        "shloka_ref": "CS_CHI_15_217"
     }
 }
 

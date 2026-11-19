@@ -116,6 +116,16 @@ class AyurvedicKnowledgeGraph:
                 "ama_involvement": False,
                 "adhisthana": "Sandhi and Snayu",
                 "shloka_ref": "CS_CHI_28_075"
+            },
+            {
+                "id": "Karshya",
+                "name": "Karshya & Atyagni (Hypermetabolic Dhatukshaya & Emaciation)",
+                "aggravates": ["Vata", "Samana Vata", "Pitta"],
+                "affects_dhatu": ["Rasa", "Mamsa", "Meda"],
+                "affects_srotas": ["Rasavaha Srotas", "Mamsavaha Srotas"],
+                "ama_involvement": False,
+                "adhisthana": "Amashaya and Dhatus",
+                "shloka_ref": "CS_SUT_21_011"
             }
         ]
 
