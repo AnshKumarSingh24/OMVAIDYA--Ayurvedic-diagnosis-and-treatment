@@ -135,7 +135,7 @@ Open [http://localhost:8000](http://localhost:8000)
 
 ---
 
-## 🏆 Compliance with Techfest 2026–27 Rules
+## 🏆 Compliance with Techfest 2026–27 Rules.
 
 - **Core Model**: Grounded on IIT Bombay's open-source 2.9B **AyurParam** architecture.
 - **Team Eligibility**: Designed for collaboration between engineering students and NCISM-enrolled **BAMS / MD (Ayurveda)** students.
